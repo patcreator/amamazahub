@@ -1,0 +1,701 @@
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    #editor:focus { outline: 2px solid rgba(59,130,246,0.25); }
+    #editor { min-height: 420px; max-height: 70vh; overflow: auto; }
+    .active-btn { background-color: rgba(15, 23, 42, 0.06); border-radius: 0.375rem; }
+    /* simple layout */
+    .layout { display: grid; grid-template-columns: 260px 1fr; gap: 1rem; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      #sidebar { order: 2; }
+      #main { order: 1; }
+    }
+    .note-item.active { background: rgba(59,130,246,0.06); }
+  </style>
+<div class="bg-gray-50 p-6 font-sans dark:bg-gray-800">
+  <div class="max-w-7xl mx-auto">
+    <header class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-bold"><button data-toggle="sidebar" class="px-1 m-2 bg-gray-500 rounded-lg"><i class="mdi mdi-menu"></i></button>Notepad</h1>
+      <div class="flex items-center gap-2">
+        <label class="flex items-center gap-2 text-sm">
+          <input id="useServer" type="checkbox">
+          <span>Sync to server</span>
+        </label>
+        <button id="syncFromServer" class="px-3 py-1 bg-white dark:bg-gray-700/25 dark:border-gray-700 border rounded dark:border-gray-700 shadow-sm hover:bg-gray-50">Sync from server</button>
+        <button id="syncToServer" class="px-3 py-1 bg-white dark:bg-gray-700/25 dark:border-gray-700 border rounded dark:border-gray-700 shadow-sm hover:bg-gray-50">Save to server</button>
+        <button id="fileMenuBtn" class="px-3 py-1 bg-white dark:bg-gray-700/25 dark:border-gray-700 border rounded dark:border-gray-700 shadow-sm hover:bg-gray-50">File ▾</button>
+      </div>
+    </header>
+
+    <!-- file menu -->
+    <div class="relative">
+      <div id="fileMenu" class="hidden absolute right-0 mt-2 w-44 bg-white dark:bg-gray-700 dark:border-gray-700 border rounded dark:border-gray-700 shadow-md z-20">
+        <button id="newFile" class="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800">New Note</button>
+        <label for="openFileInput" class="w-full block text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">Open…</label>
+        <input id="openFileInput" type="file" accept=".html,.htm,.txt,.md" class="hidden" />
+        <button id="saveHtml" class="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800">Save (.html)</button>
+        <button id="saveTxt" class="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800">Save (.txt)</button>
+        <button id="printDoc" class="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800">Print</button>
+        <button id="exitBtn" class="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800">Exit</button>
+      </div>
+    </div>
+
+    <main class="mt-4">
+      <!-- Sidebar -->
+      <aside id="sidebar" class="bg-white w-full hidden sidebar dark:bg-gray-800 dark:border-gray-700 border rounded dark:border-gray-700-lg p-3 shadow-sm h-[70vh] overflow-auto">
+        <div class="flex items-center gap-2 mb-3">
+          <input id="searchNotes" placeholder="Search notes..." class="flex-1 p-2 border rounded dark:border-gray-700 dark:bg-gray-700 dark:border-gray-800" />
+          <button id="newNoteBtn" title="New note" class="px-3 py-1 bg-red-500 text-white rounded"><i class="mdi mdi-plus"></i></button>
+        </div>
+        <div id="notesList" class="space-y-1"></div>
+        <div class="mt-4 text-xs text-gray-500">
+          Autosave:
+          <select id="autosaveInterval" class="ml-1 border rounded dark:border-gray-700 p-1 text-sm">
+            <option value="0">Off</option>
+            <option value="3">3s</option>
+            <option value="10" selected>10s</option>
+            <option value="30">30s</option>
+          </select>
+        </div>
+      </aside>
+
+      <!-- Main editor area -->
+      <section id="main" class="space-y-3">
+        <!-- Toolbar -->
+        <div class="bg-white dark:bg-gray-700/25 dark:border-gray-700 border rounded dark:border-gray-700-lg shadow-sm p-3">
+          <div class="flex flex-wrap gap-2 items-center">
+
+            <div class="flex items-center gap-1">
+              <label class="text-sm text-gray-600 mr-1">Heading</label>
+              <select id="headingSelect" class="p-1 border rounded dark:border-gray-700">
+                <option value="">Normal</option>
+                <option value="h1">H1</option>
+                <option value="h2">H2</option>
+                <option value="h3">H3</option>
+                <option value="h4">H4</option>
+                <option value="h5">H5</option>
+                <option value="h6">H6</option>
+              </select>
+            </div>
+
+            <button id="ulBtn" class="px-2 py-1 border dark:border-gray-700 rounded">• List</button>
+            <button id="olBtn" class="px-2 py-1 border dark:border-gray-700 rounded">1. List</button>
+
+            <button id="boldBtn" class="px-2 py-1 border dark:border-gray-700 rounded font-bold">B</button>
+            <button id="italicBtn" class="px-2 py-1 border dark:border-gray-700 rounded italic">I</button>
+            <button id="underlineBtn" class="px-2 py-1 border dark:border-gray-700 rounded underline">U</button>
+
+            <button id="linkBtn" class="px-2 py-1 border dark:border-gray-700 rounded">Link</button>
+            <button id="hrBtn" class="px-2 py-1 border dark:border-gray-700 rounded">HR</button>
+            <button id="clearFmtBtn" class="px-2 py-1 border dark:border-gray-700 rounded">Clean Format</button>
+            <button id="undoBtn" class="px-2 py-1 border dark:border-gray-700 rounded">↶</button>
+            <button id="redoBtn" class="px-2 py-1 border dark:border-gray-700 rounded">↷</button>
+
+            <div class="flex items-center gap-2 ml-2">
+              <label class="text-sm text-gray-600">Font</label>
+              <select id="fontSelect" class="p-1 border rounded dark:border-gray-700">
+                <option value="inherit">Default</option>
+                <option value="Arial">Arial</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+              </select>
+              <label class="text-sm text-gray-600">Size</label>
+              <select id="sizeSelect" class="p-1 border rounded dark:border-gray-700 w-24">
+                <option value="">Default</option>
+                <option value="12px">12</option>
+                <option value="14px">14</option>
+                <option value="16px">16</option>
+                <option value="18px">18</option>
+                <option value="24px">24</option>
+                <option value="32px">32</option>
+              </select>
+              <input id="colorInput" type="color" title="Text color" class="w-9 h-9 p-0 border rounded dark:border-gray-700" />
+              <input id="bgColorInput" type="color" title="Highlight color" class="w-9 h-9 p-0 border rounded dark:border-gray-700" />
+            </div>
+
+            <div class="ml-auto flex items-center gap-2">
+              <label class="text-sm text-gray-600">Apply to</label>
+              <select id="applyScope" class="p-1 border rounded dark:border-gray-700">
+                <option value="selection">Selection</option>
+                <option value="document">Whole document</option>
+              </select>
+              <button id="formatAllBtn" class="ml-2 px-3 py-1 bg-red-500 text-white rounded">Format All Occurrences</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Editor area + markdown preview toggle -->
+        <div class="bg-white dark:bg-gray-700/25 dark:border-gray-700 border rounded dark:border-gray-700-lg shadow-sm p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <label class="flex items-center gap-2"><input type="checkbox" id="markdownMode"> Markdown mode</label>
+            <button id="togglePreview" class="px-2 py-1 border dark:border-gray-700 rounded">Toggle Preview</button>
+            <div class="ml-auto flex items-center gap-2 text-sm text-gray-500">
+              <span id="statusIndicator">Idle</span>
+            </div>
+          </div>
+
+          <div class="md:grid md:grid-cols-1 gap-4">
+            <div>
+              <div id="editor" contenteditable="true" class="prose max-w-none focus:outline-none border rounded dark:border-gray-700 p-3" spellcheck="true">
+                <h2>Untitled note</h2>
+                <p>Start typing…</p>
+              </div>
+            </div>
+            <div id="previewWrap" class="hidden border rounded dark:border-gray-700 p-3 overflow-auto" style="max-height:50vh;">
+              <div id="preview" class="prose max-w-none"></div>
+            </div>
+          </div>
+
+          <div class="mt-3 flex gap-2">
+            <button id="saveBtn" class="px-3 py-1 bg-green-500 text-white rounded">Save (local)</button>
+            <button id="downloadHtml" class="px-3 py-1 bg-white dark:bg-gray-700/25 dark:border-gray-700 border rounded dark:border-gray-700">Download .html</button>
+            <button id="downloadTxt" class="px-3 py-1 bg-white dark:bg-gray-700/25 dark:border-gray-700 border rounded dark:border-gray-700">Download .txt</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+/* ========= Frontend logic ========= */
+
+const LS_KEY = 'notepad_notes_v1';
+const LS_CURRENT = 'notepad_current_id';
+let notes = []; // {id,title,content, updated_at}
+let currentId = null;
+let autosaveTimer = null;
+
+// Elements
+const notesListEl = document.getElementById('notesList');
+const newNoteBtn = document.getElementById('newNoteBtn');
+const searchNotes = document.getElementById('searchNotes');
+const editor = document.getElementById('editor');
+const headingSelect = document.getElementById('headingSelect');
+const ulBtn = document.getElementById('ulBtn');
+const olBtn = document.getElementById('olBtn');
+const boldBtn = document.getElementById('boldBtn');
+const italicBtn = document.getElementById('italicBtn');
+const underlineBtn = document.getElementById('underlineBtn');
+const linkBtn = document.getElementById('linkBtn');
+const hrBtn = document.getElementById('hrBtn');
+const clearFmtBtn = document.getElementById('clearFmtBtn');
+const undoBtn = document.getElementById('undoBtn');
+const redoBtn = document.getElementById('redoBtn');
+const fontSelect = document.getElementById('fontSelect');
+const sizeSelect = document.getElementById('sizeSelect');
+const colorInput = document.getElementById('colorInput');
+const bgColorInput = document.getElementById('bgColorInput');
+const applyScope = document.getElementById('applyScope');
+const formatAllBtn = document.getElementById('formatAllBtn');
+const autosaveInterval = document.getElementById('autosaveInterval');
+const newFileBtn = document.getElementById('newFile');
+const openFileInput = document.getElementById('openFileInput');
+const saveHtmlBtn = document.getElementById('saveHtml');
+const saveTxtBtn = document.getElementById('saveTxt');
+const printBtn = document.getElementById('printDoc');
+const exitBtn = document.getElementById('exitBtn');
+const fileMenuBtn = document.getElementById('fileMenuBtn');
+const fileMenu = document.getElementById('fileMenu');
+const saveBtn = document.getElementById('saveBtn');
+const downloadHtml = document.getElementById('downloadHtml');
+const downloadTxt = document.getElementById('downloadTxt');
+const markdownMode = document.getElementById('markdownMode');
+const previewWrap = document.getElementById('previewWrap');
+const previewEl = document.getElementById('preview');
+const togglePreview = document.getElementById('togglePreview');
+const statusIndicator = document.getElementById('statusIndicator');
+const useServer = document.getElementById('useServer');
+const syncFromServer = document.getElementById('syncFromServer');
+const syncToServer = document.getElementById('syncToServer');
+const fileMenuWrap = fileMenuBtn.parentElement;
+
+// file menu toggle
+fileMenuBtn.addEventListener('click', () => fileMenu.classList.toggle('hidden'));
+document.addEventListener('click', (e) => {
+  if (!fileMenuWrap.contains(e.target)) fileMenu.classList.add('hidden');
+});
+
+// load from localStorage
+function loadFromLocal() {
+  try {
+    notes = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+  } catch (e) {
+    notes = [];
+  }
+  currentId = localStorage.getItem(LS_CURRENT) || null;
+  renderNotesList();
+  if (currentId) openNoteById(currentId);
+  else if (notes.length) { openNoteById(notes[0].id); }
+}
+function saveLocalNotes() {
+  localStorage.setItem(LS_KEY, JSON.stringify(notes));
+}
+
+// create new note
+function createNote(title = 'Untitled note', content = '<p></p>') {
+  const n = { id: 'n' + Date.now(), title: title, content: content, updated_at: new Date().toISOString() };
+  notes.unshift(n);
+  currentId = n.id;
+  saveLocalNotes();
+  localStorage.setItem(LS_CURRENT, currentId);
+  renderNotesList();
+  openNoteById(currentId);
+}
+
+// render sidebar list
+function renderNotesList(filter='') {
+  const f = filter.toLowerCase();
+  notesListEl.innerHTML = '';
+  notes.forEach(n => {
+    if (f && !(n.title && n.title.toLowerCase().includes(f))) return;
+    const el = document.createElement('div');
+    el.className = 'note-item p-2 rounded flex items-center justify-between cursor-pointer';
+    if (n.id === currentId) el.classList.add('active');
+    el.innerHTML = `
+      <div data-toggle='sidebar' class="truncate close-side"><strong>${escapeHtml(n.title)}</strong><div class="text-xs text-gray-500">${new Date(n.updated_at).toLocaleString()}</div></div>
+      <div class="flex gap-2">
+        <button data-id="${n.id}" class="edit-title text-gray-500 text-xs"><i class='mdi mdi-rename'></i></button>
+        <button data-id="${n.id}" class="delete-note text-red-500 text-xs"><i class="mdi mdi-delete"></i></button>
+      </div>
+    `;
+    el.addEventListener('click', (ev) => {
+      if (ev.target.classList.contains('edit-title') || ev.target.classList.contains('delete-note')) return;
+      openNoteById(n.id);
+      toggleSide();
+    });
+    el.querySelector('.edit-title').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const newTitle = prompt('New title:', n.title);
+      if (newTitle !== null) {
+        n.title = newTitle || 'Untitled';
+        n.updated_at = new Date().toISOString();
+        saveLocalNotes();
+        renderNotesList(searchNotes.value);
+      }
+    });
+    el.querySelector('.delete-note').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      if (!confirm('Delete this note?')) return;
+      notes = notes.filter(x => x.id !== n.id);
+      if (currentId === n.id) currentId = notes[0]?.id || null;
+      saveLocalNotes();
+      localStorage.setItem(LS_CURRENT, currentId || '');
+      renderNotesList(searchNotes.value);
+      if (currentId) openNoteById(currentId);
+      else editor.innerHTML = '<h2>Untitled note</h2><p></p>';
+    });
+    notesListEl.appendChild(el);
+  });
+}
+
+// open note by id
+function openNoteById(id) {
+  const n = notes.find(x => x.id === id);
+  if (!n) return;
+  currentId = id;
+  localStorage.setItem(LS_CURRENT, currentId);
+  editor.innerHTML = n.content || '<p></p>';
+  renderNotesList(searchNotes.value);
+  updatePreview();
+}
+
+// save current editor into notes array (local)
+function saveCurrentToLocal() {
+  if (!currentId) {
+    createNote('Untitled note', editor.innerHTML);
+    return;
+  }
+  const n = notes.find(x => x.id === currentId);
+  const title = extractTitleFromContent(editor.innerText || '');
+  if (n) {
+    n.content = editor.innerHTML;
+    n.title = title || n.title || 'Untitled note';
+    n.updated_at = new Date().toISOString();
+  } else {
+    notes.unshift({ id: currentId, title: title || 'Untitled', content: editor.innerHTML, updated_at: new Date().toISOString() });
+  }
+  saveLocalNotes();
+  renderNotesList(searchNotes.value);
+  status('Saved locally');
+}
+
+// extract a short title from content (first non-empty line)
+function extractTitleFromContent(text) {
+  const lines = (text || '').split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length === 0) return '';
+  const first = lines[0];
+  return first.length > 60 ? first.slice(0,60) + '…' : first;
+}
+
+// autosave handling
+function startAutosave() {
+  clearInterval(autosaveTimer);
+  const sec = parseInt(autosaveInterval.value, 10);
+  if (!sec || sec <= 0) return;
+  autosaveTimer = setInterval(() => {
+    saveCurrentToLocal();
+  }, sec * 1000);
+}
+autosaveInterval.addEventListener('change', startAutosave);
+
+// toolbar exec wrapper
+function exec(cmd, value = null) {
+  document.execCommand(cmd, false, value);
+  editor.focus();
+}
+
+// basic toolbar bindings
+boldBtn.addEventListener('click', () => exec('bold'));
+italicBtn.addEventListener('click', () => exec('italic'));
+underlineBtn.addEventListener('click', () => exec('underline'));
+ulBtn.addEventListener('click', () => insertHTML('insertUnorderedList'));
+olBtn.addEventListener('click', () => insertHTML('insertOrderedList'));
+undoBtn.addEventListener('click', () => exec('undo'));
+redoBtn.addEventListener('click', () => exec('redo'));
+hrBtn.addEventListener('click', () => insertHTML('<hr>'));
+clearFmtBtn.addEventListener('click', () => exec('removeFormat'));
+
+headingSelect.addEventListener('change', (e) => {
+  const v = e.target.value;
+  if (!v) exec('formatBlock', '<p>');
+  else exec('formatBlock', '<' + v + '>');
+  e.target.value = '';
+});
+
+linkBtn.addEventListener('click', () => {
+  const url = prompt('Enter URL (include https:// if needed):', 'https://');
+  if (url) exec('createLink', url);
+});
+
+function insertHTML(html) {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  range.deleteContents();
+  const el = document.createElement('div');
+  el.innerHTML = html;
+  const frag = document.createDocumentFragment();
+  let node, lastNode;
+  while ((node = el.firstChild)) lastNode = frag.appendChild(node);
+  range.insertNode(frag);
+  if (lastNode) {
+    range.setStartAfter(lastNode);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  editor.focus();
+}
+
+// style apply functions (selection or whole doc)
+fontSelect.addEventListener('change', () => applyStyleToTarget(el => el.style.fontFamily = fontSelect.value || ''));
+sizeSelect.addEventListener('change', () => applyStyleToTarget(el => el.style.fontSize = sizeSelect.value || ''));
+colorInput.addEventListener('change', () => applyStyleToTarget(el => el.style.color = colorInput.value || ''));
+bgColorInput.addEventListener('change', () => applyStyleToTarget(el => el.style.backgroundColor = bgColorInput.value || ''));
+
+function applyStyleToTarget(styleCallback) {
+  const scope = applyScope.value;
+  if (scope === 'selection') {
+    applyStyleToSelection(styleCallback);
+  } else {
+    const children = Array.from(editor.childNodes);
+        children.forEach(node => wrapNodeWithSpanStyle(node, styleCallback));
+  }
+  editor.focus();
+}
+function wrapNodeWithSpanStyle(node, styleCallback) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    const span = document.createElement('span');
+    span.textContent = node.textContent;
+    styleCallback(span);
+    node.parentNode.replaceChild(span, node);
+  } else if (node.nodeType === Node.ELEMENT_NODE) {
+    styleCallback(node);
+  }
+}
+function applyStyleToSelection(styleCallback) {
+  const sel = window.getSelection();
+  if (sel.isCollapsed) return showMessage('Please select text first.');
+  const range = sel.getRangeAt(0);
+  const content = range.extractContents();
+  const wrapper = document.createElement('span');
+  wrapper.appendChild(content);
+  styleCallback(wrapper);
+  range.insertNode(wrapper);
+  sel.removeAllRanges();
+  const newRange = document.createRange();
+  newRange.selectNodeContents(wrapper);
+  sel.addRange(newRange);
+}
+
+// Format all occurrences
+formatAllBtn.addEventListener('click', () => {
+  const sel = window.getSelection();
+  if (sel.isCollapsed) return showMessage('Select a word to format all its occurrences.');
+  const selectedText = sel.toString().trim();
+  if (!selectedText) return showMessage('Select a valid word or phrase first.');
+  // build style
+  const styleObj = {};
+  styleObj.fontWeight = document.queryCommandState('bold') ? 'bold' : '';
+  styleObj.fontStyle = document.queryCommandState('italic') ? 'italic' : '';
+  styleObj.textDecoration = document.queryCommandState('underline') ? 'underline' : '';
+  if (colorInput.value) styleObj.color = colorInput.value;
+  if (bgColorInput.value) styleObj.backgroundColor = bgColorInput.value;
+  const font = fontSelect.value; if (font && font !== 'inherit') styleObj.fontFamily = font;
+  const fsize = sizeSelect.value; if (fsize) styleObj.fontSize = fsize;
+  if (!confirm(`Apply formatting to all occurrences of "${selectedText}"?`)) return;
+  const regex = new RegExp('\\b' + escapeRegExp(selectedText) + '\\b', 'gi');
+  traverseAndReplaceTextNodes(editor, regex, (match) => {
+    const span = document.createElement('span');
+    span.textContent = match;
+    for (const k in styleObj) if (styleObj[k]) span.style[k] = styleObj[k];
+    return span;
+  });
+});
+
+// walker replace
+function traverseAndReplaceTextNodes(root, regex, makeNode) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+  const toReplace = [];
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    if (!node.nodeValue.trim()) continue;
+    regex.lastIndex = 0;
+    if (regex.test(node.nodeValue)) toReplace.push(node);
+  }
+  toReplace.forEach(textNode => {
+    const frag = document.createDocumentFragment();
+    let lastIndex = 0;
+    const text = textNode.nodeValue;
+    regex.lastIndex = 0;
+    let m;
+    while ((m = regex.exec(text)) !== null) {
+      const before = text.slice(lastIndex, m.index);
+      if (before) frag.appendChild(document.createTextNode(before));
+      frag.appendChild(makeNode(m[0]));
+      lastIndex = m.index + m[0].length;
+    }
+    const after = text.slice(lastIndex);
+    if (after) frag.appendChild(document.createTextNode(after));
+    textNode.parentNode.replaceChild(frag, textNode);
+  });
+}
+
+// utilities
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function escapeHtml(unsafe) {
+  return (unsafe+'').replace(/[&<"'>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' })[m]);
+}
+
+// file menu actions (open/save/print/exit)
+newFileBtn.addEventListener('click', () => {
+  if (confirm('Discard current note and create a new note?')) {
+    createNote();
+  }
+  fileMenu.classList.add('hidden');
+});
+openFileInput.addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const text = ev.target.result;
+    if (f.name.match(/\.txt$/i)) {
+      const safe = escapeHtml(text).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
+      createNote(f.name, '<p>' + safe + '</p>');
+    } else if (f.name.match(/\.md$/i)) {
+      createNote(f.name, '<pre>' + escapeHtml(text) + '</pre>');
+    } else {
+      // html
+      createNote(f.name, text);
+    }
+  };
+  reader.readAsText(f);
+  openFileInput.value = '';
+  fileMenu.classList.add('hidden');
+});
+saveHtmlBtn.addEventListener('click', () => {
+  const html = editor.innerHTML;
+  const fullHtml = `<!doctype html><html><head><meta charset="utf-8"><title>note</title></head><body>${html}</body></html>`;
+  download('note.html', fullHtml, 'text/html');
+  fileMenu.classList.add('hidden');
+});
+saveTxtBtn.addEventListener('click', () => {
+  const text = editor.innerText;
+  download('note.txt', text, 'text/plain');
+  fileMenu.classList.add('hidden');
+});
+printBtn.addEventListener('click', () => {
+  const w = window.open('', '_blank');
+  w.document.write('<html><head><title>Print</title></head><body>');
+  w.document.write(editor.innerHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  w.print();
+  fileMenu.classList.add('hidden');
+});
+exitBtn.addEventListener('click', () => {
+  if (confirm('Close this window? Unsaved changes will be lost.')) window.close();
+  fileMenu.classList.add('hidden');
+});
+function download(filename, content, mime='text/html') {
+  const blob = new Blob([content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// save button local
+saveBtn.addEventListener('click', () => { saveCurrentToLocal(); });
+
+// download helpers
+downloadHtml.addEventListener('click', () => {
+  const html = editor.innerHTML;
+  const fullHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(notes.find(n=>n.id===currentId)?.title||'note')}</title></head><body>${html}</body></html>`;
+  download((notes.find(n=>n.id===currentId)?.title||'note') + '.html', fullHtml, 'text/html');
+});
+downloadTxt.addEventListener('click', () => {
+  const text = editor.innerText;
+  download((notes.find(n=>n.id===currentId)?.title||'note') + '.txt', text, 'text/plain');
+});
+
+// new note button
+document.getElementById('newNoteBtn').addEventListener('click', () => createNote());
+
+// search notes
+searchNotes.addEventListener('input', (e) => renderNotesList(e.target.value));
+
+// editor change triggers preview & status & local save debounce
+let typingTimer = null;
+editor.addEventListener('input', () => {
+  status('Editing…');
+  updatePreview();
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    saveCurrentToLocal();
+    status('Saved');
+  }, 1000);
+});
+
+// preview / markdown mode
+markdownMode.addEventListener('change', updatePreview);
+togglePreview.addEventListener('click', () => previewWrap.classList.toggle('hidden'));
+function updatePreview() {
+  if (markdownMode.checked) {
+    const text = editor.innerText || '';
+    previewEl.innerHTML = marked.parse(text);
+    previewWrap.classList.remove('hidden');
+  } else {
+    previewEl.innerHTML = '';
+    previewWrap.classList.add('hidden');
+  }
+}
+
+// toolbar state updater
+function updateToolbarState() {
+  toggleActive(boldBtn, document.queryCommandState('bold'));
+  toggleActive(italicBtn, document.queryCommandState('italic'));
+  toggleActive(underlineBtn, document.queryCommandState('underline'));
+}
+function toggleActive(el, on) { el.classList.toggle('active-btn', on); }
+editor.addEventListener('keyup', updateToolbarState);
+editor.addEventListener('mouseup', updateToolbarState);
+
+// keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); exec('bold'); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') { e.preventDefault(); exec('italic'); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') { e.preventDefault(); exec('underline'); }
+});
+
+// status text
+function status(txt) {
+  statusIndicator.textContent = txt;
+  setTimeout(()=>{ if (statusIndicator.textContent === txt) statusIndicator.textContent = 'Idle'; }, 2000);
+}
+
+/* ======= Server sync (simple PHP API) =======
+API endpoint: api/notes.php
+POST actions:
+  - action=list  -> returns JSON array of notes
+  - action=get   + id -> returns single note
+  - action=create + title + content -> create, returns id
+  - action=update + id + title + content -> update
+  - action=delete + id
+All requests send/receive JSON.
+*/
+function apiCall(data) {
+  return fetch('/PDT-NEW/projects/pdo/app/system/api/notes/notes.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    credentials: 'same-origin'
+  }).then(r => r.json());
+}
+
+syncFromServer.addEventListener('click', async () => {
+  if (!useServer.checked) return showMessage('Enable "Sync to server" first.');
+  try {
+    status('Syncing from server...');
+    const res = await apiCall({ action: 'list' });
+    if (!res || !Array.isArray(res)) throw new Error('Invalid response');
+    // merge (simple replace local notes with server notes for clarity)
+    notes = res.map(n => ({ id: 's' + n.id, title: n.title, content: n.content, updated_at: n.updated_at }));
+    saveLocalNotes();
+    renderNotesList();
+    if (notes.length) { openNoteById(notes[0].id); }
+    status('Synced from server');
+  } catch (e) {
+    showMessage('Sync error: ' + e.message);
+    status('Sync failed');
+  }
+});
+
+syncToServer.addEventListener('click', async () => {
+  if (!useServer.checked) return showMessage('Enable "Sync to server" first.');
+  try {
+    status('Syncing to server...');
+    // push local notes to server (create/update)
+    for (const n of notes) {
+      // local server-backed notes start with 's' prefix removed
+      if (n.id && n.id.startsWith('s')) {
+        // update existing server note (id after 's')
+        const sid = n.id.slice(1);
+        await apiCall({ action: 'update', id: sid, title: n.title, content: n.content });
+      } else {
+        // create new on server
+        const createRes = await apiCall({ action: 'create', title: n.title, content: n.content });
+        if (createRes && createRes.id) {
+          // update local id to server-based id for future sync
+          n.id = 's' + createRes.id;
+        }
+      }
+    }
+    saveLocalNotes();
+    renderNotesList();
+    status('Synced to server');
+  } catch (e) {
+    showMessage('Sync error: ' + e.message);
+    status('Sync failed');
+  }
+});
+
+// on load
+loadFromLocal();
+startAutosave();
+
+$("[data-toggle='sidebar'], .close-side").each(function(a,b){
+    b.addEventListener("click", function(){
+      toggleSide();
+    });
+});
+function toggleSide(){
+  $('.sidebar').toggleClass('hidden');
+}
+</script>
+</div>

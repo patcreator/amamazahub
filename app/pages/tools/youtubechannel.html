@@ -1,0 +1,225 @@
+<script src="https://apis.google.com/js/platform.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+
+<div class="bg-gray-900 text-white flex flex-col items-center justify-center p-4">
+
+  <div class="bg-gray-800 rounded-2xl shadow-lg p-6 w-full text-center space-y-4">
+    <h1 class="text-2xl font-bold mb-4">🎥 YouTube Integration</h1>
+
+    <!-- Channel Setup Section -->
+    <div id="channel-section" class="space-y-4">
+      <div id="channel-setup" class="space-y-2 hidden">
+        <input id="channel-id" type="text" placeholder="Enter YouTube Channel ID"
+               class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+        <button id="save-channel" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded w-full">
+          Save Channel
+        </button>
+      </div>
+
+      <div id="subscribe-section" class="hidden space-y-2">
+        <h2 class="text-lg font-semibold">Subscribe to Channel</h2>
+        <div id="yt-subscribe"></div>
+        <button id="change-channel" class="mt-2 text-sm text-gray-400 hover:text-white">Change Channel</button>
+      </div>
+    </div>
+
+    <hr class="border-gray-700 my-4">
+
+    <!-- Playlist Section -->
+    <div class="space-y-2">
+      <div class="flex justify-center gap-3">
+        <button id="add-playlist-btn" title="Add Playlist"
+                class="p-2 bg-gray-600 hover:bg-red-700 rounded-full">
+          <i class="mdi mdi-playlist-plus text-xl"></i>
+        </button>
+        <button id="toggle-playlist-history" title="Show/Hide Playlist History"
+                class="p-2 bg-gray-600 hover:bg-blue-700 rounded-full">
+          <i class="mdi mdi-history text-xl"></i>
+        </button>
+      </div>
+
+      <div id="playlist-input" class="hidden space-y-2">
+        <input id="playlist-id" type="text" placeholder="Enter Playlist ID or URL"
+               class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button id="play-playlist" class="bg-blue-600 hover:bg-blue-700 w-full py-2 rounded">Play Playlist</button>
+      </div>
+
+      <div id="playlist-history" class="hidden text-left mt-2 space-y-1 max-h-48 overflow-y-auto">
+        <!-- playlist history list -->
+      </div>
+    </div>
+
+    <!-- Video Section -->
+    <div class="space-y-2 mt-4">
+      <div class="flex justify-center gap-3">
+        <button id="add-video-btn" title="Add Video"
+                class="p-2 bg-gray-600 hover:bg-red-700 rounded-full">
+          <i class="mdi mdi-video-plus text-xl"></i>
+        </button>
+        <button id="toggle-video-history" title="Show/Hide Video History"
+                class="p-2 bg-gray-600 hover:bg-green-700 rounded-full">
+          <i class="mdi mdi-history text-xl"></i>
+        </button>
+      </div>
+
+      <div id="video-input" class="hidden space-y-2">
+        <input id="video-id" type="text" placeholder="Enter Video ID or URL"
+               class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+        <button id="play-video" class="bg-green-600 hover:bg-green-700 w-full py-2 rounded">Play Video</button>
+      </div>
+
+      <div id="video-history" class="hidden text-left mt-2 space-y-1 max-h-48 overflow-y-auto">
+        <!-- video history list -->
+      </div>
+    </div>
+
+    <!-- Display Player -->
+    <div id="player-container" class="mt-6 hidden">
+      <iframe id="yt-player" width="100%" height="250" frameborder="0"
+              allowfullscreen class="rounded-xl"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // === Utility Functions ===
+    const extractYouTubeID = (url) => {
+      if (!url) return { video: null, playlist: null };
+      const videoMatch = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      const playlistMatch = url.match(/(?:list=)([a-zA-Z0-9_-]+)/);
+      return {
+        video: videoMatch ? videoMatch[1] : null,
+        playlist: playlistMatch ? playlistMatch[1] : null
+      };
+    };
+
+    const getStorage = (key) => JSON.parse(localStorage.getItem(key) || "[]");
+    const setStorage = (key, arr) => localStorage.setItem(key, JSON.stringify(arr));
+
+    // === Channel Setup ===
+    const channelSetup = document.getElementById('channel-setup');
+    const subscribeSection = document.getElementById('subscribe-section');
+    const ytSubscribe = document.getElementById('yt-subscribe');
+    const changeChannel = document.getElementById('change-channel');
+    const savedChannelID = localStorage.getItem('channelID');
+
+    const renderSubscribeButton = (channelID) => {
+      ytSubscribe.innerHTML = `
+        <div class="g-ytsubscribe"
+             data-channelid="${channelID}"
+             data-layout="full"
+             data-theme="dark"
+             data-count="default"></div>
+      `;
+      if (window.gapi?.ytsubscribe) gapi.ytsubscribe.go();
+    };
+
+    const showChannelSetup = () => {
+      channelSetup.classList.remove('hidden');
+      subscribeSection.classList.add('hidden');
+    };
+    const showSubscribeSection = () => {
+      channelSetup.classList.add('hidden');
+      subscribeSection.classList.remove('hidden');
+    };
+
+    if (savedChannelID) {
+      showSubscribeSection();
+      renderSubscribeButton(savedChannelID);
+    } else {
+      showChannelSetup();
+    }
+
+    document.getElementById('save-channel').addEventListener('click', () => {
+      const channelID = document.getElementById('channel-id').value.trim();
+      if (channelID) {
+        localStorage.setItem('channelID', channelID);
+        renderSubscribeButton(channelID);
+        showSubscribeSection();
+      }
+    });
+    changeChannel.addEventListener('click', () => {
+      localStorage.removeItem('channelID');
+      showChannelSetup();
+    });
+
+    // === Playlist Section ===
+    const addPlaylistBtn = document.getElementById('add-playlist-btn');
+    const playlistInputDiv = document.getElementById('playlist-input');
+    const playPlaylistBtn = document.getElementById('play-playlist');
+    const playlistInput = document.getElementById('playlist-id');
+    const playlistHistoryDiv = document.getElementById('playlist-history');
+    const togglePlaylistHistory = document.getElementById('toggle-playlist-history');
+
+    addPlaylistBtn.addEventListener('click', () => playlistInputDiv.classList.toggle('hidden'));
+    togglePlaylistHistory.addEventListener('click', () => playlistHistoryDiv.classList.toggle('hidden'));
+
+    const renderPlaylistHistory = () => {
+      const history = getStorage('playlistHistory');
+      playlistHistoryDiv.innerHTML = history.length
+        ? history.map(id => `<div class="p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600" data-id="${id}">📜 ${id}</div>`).join('')
+        : '<p class="text-sm text-gray-400">No playlists yet.</p>';
+      playlistHistoryDiv.querySelectorAll('[data-id]').forEach(el => {
+        el.addEventListener('click', () => playPlaylist(el.dataset.id));
+      });
+    };
+
+    const playPlaylist = (id) => {
+      document.getElementById('player-container').classList.remove('hidden');
+      document.getElementById('yt-player').src = `https://www.youtube.com/embed/videoseries?list=${id}&autoplay=1`;
+    };
+
+    playPlaylistBtn.addEventListener('click', () => {
+      const input = playlistInput.value.trim();
+      const { playlist } = extractYouTubeID(input);
+      if (playlist) {
+        const history = getStorage('playlistHistory');
+        if (!history.includes(playlist)) history.unshift(playlist);
+        setStorage('playlistHistory', history.slice(0, 20));
+        playPlaylist(playlist);
+        renderPlaylistHistory();
+      } else alert('Invalid playlist URL or ID');
+    });
+
+    // === Video Section ===
+    const addVideoBtn = document.getElementById('add-video-btn');
+    const videoInputDiv = document.getElementById('video-input');
+    const playVideoBtn = document.getElementById('play-video');
+    const videoInput = document.getElementById('video-id');
+    const videoHistoryDiv = document.getElementById('video-history');
+    const toggleVideoHistory = document.getElementById('toggle-video-history');
+
+    addVideoBtn.addEventListener('click', () => videoInputDiv.classList.toggle('hidden'));
+    toggleVideoHistory.addEventListener('click', () => videoHistoryDiv.classList.toggle('hidden'));
+
+    const renderVideoHistory = () => {
+      const history = getStorage('videoHistory');
+      videoHistoryDiv.innerHTML = history.length
+        ? history.map(id => `<div class="p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600" data-id="${id}">🎬 ${id}</div>`).join('')
+        : '<p class="text-sm text-gray-400">No videos yet.</p>';
+      videoHistoryDiv.querySelectorAll('[data-id]').forEach(el => {
+        el.addEventListener('click', () => playVideo(el.dataset.id));
+      });
+    };
+
+    const playVideo = (id) => {
+      document.getElementById('player-container').classList.remove('hidden');
+      document.getElementById('yt-player').src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+    };
+
+    playVideoBtn.addEventListener('click', () => {
+      const input = videoInput.value.trim();
+      const { video } = extractYouTubeID(input);
+      if (video) {
+        const history = getStorage('videoHistory');
+        if (!history.includes(video)) history.unshift(video);
+        setStorage('videoHistory', history.slice(0, 20));
+        playVideo(video);
+        renderVideoHistory();
+      } else alert('Invalid video URL or ID');
+    });
+
+    // Initial render
+    renderPlaylistHistory();
+    renderVideoHistory();
+  </script>
+</div>

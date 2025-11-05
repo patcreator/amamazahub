@@ -1,0 +1,248 @@
+
+<div class="bg-gray-100 dark:bg-gray-800 min-h-screen p-8 text-gray-800 dark:text-gray-100">
+
+  <div class="max-w-5xl mx-auto bg-gray-100 dark:bg-gray-700 p-6 rounded-2xl shadow-lg">
+    <h1 class="text-2xl font-bold mb-4 text-center">🧩 Table Creator Tool</h1>
+
+    <!-- Select or create table -->
+    <div class="mb-4 flex gap-2 items-end">
+      <div class="flex-1">
+        <label class="block text-gray-700 dark:text-gray-200 font-medium mb-1">Table Name:</label>
+        <input type="text" id="tableName" class="border p-2 w-full rounded-md dark:bg-gray-800 dark:border-gray-700" placeholder="e.g. users">
+      </div>
+      <button id="createTable" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Create Table</button>
+    </div>
+
+    <!-- Existing tables -->
+    <div id="tableListContainer" class="mb-6 hidden">
+      <h2 class="font-semibold mb-2">📚 Saved Tables:</h2>
+      <div id="tableList" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <!-- Add Column Form -->
+    <div id="tableBuilder" class="hidden">
+      <div class="grid grid-cols-5 gap-2 mb-4">
+        <input type="text" id="colName" class="border p-2 rounded-md dark:bg-gray-800 dark:border-gray-700" placeholder="Column Name">
+        <input type="text" id="colType" class="border p-2 rounded-md dark:bg-gray-800 dark:border-gray-700" placeholder="Type (e.g. INT, TEXT)">
+        <select id="colPK" class="border p-2 rounded-md dark:bg-gray-800 dark:border-gray-700">
+          <option value="false">PK?</option>
+          <option value="true">Yes</option>
+        </select>
+        <select id="colUnique" class="border p-2 rounded-md dark:bg-gray-800 dark:border-gray-700">
+          <option value="false">Unique?</option>
+          <option value="true">Yes</option>
+        </select>
+        <select id="colNull" class="border p-2 rounded-md dark:bg-gray-800 dark:border-gray-700">
+          <option value="false">Not Null</option>
+          <option value="true">Nullable</option>
+        </select>
+      </div>
+
+      <button id="addColumn" class="bg-red-600 text-white px-4 py-2 rounded-md mb-6 hover:bg-red-700">
+        <i class="mdi mdi-plus-circle"></i> Add Column
+      </button>
+
+      <!-- Table Display -->
+      <div id="tableContainer" class="overflow-x-auto mb-6 hidden">
+        <table id="dataTable" class="min-w-full border-collapse border dark:border-gray-700 border-gray-400">
+          <thead class="bg-gray-600 text-white"></thead>
+          <tbody></tbody>
+        </table>
+        <button id="addRow" class="mt-4 bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-white px-4 py-2 rounded-md hover:bg-gray-700">
+          <i class="mdi mdi-plus-circle"></i> Add Row
+        </button>
+      </div>
+
+      <!-- Export Buttons -->
+      <div id="exportButtons" class="mt-6 hidden flex flex-wrap gap-4 justify-center">
+        <button class="export-btn bg-gray-800 text-white px-4 py-2 rounded-md" data-type="html"><i class="mdi mdi-content-save"></i> Save as HTML</button>
+        <button class="export-btn border border-blue-500 text-blue-500 px-4 py-2 rounded-md" data-type="json"><i class="mdi mdi-content-save"></i> Save as JSON</button>
+        <button class="export-btn border border-purple-500 text-purple-500 px-4 py-2 rounded-md" data-type="xml"><i class="mdi mdi-content-save"></i> Save as XML</button>
+        <button class="export-btn border border-orange-500 text-orange-500 px-4 py-2 rounded-md" data-type="sql"><i class="mdi mdi-content-save"></i> Save as SQL</button>
+        <button id="saveLocal" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"><i class="mdi mdi-content-save"></i> Save to Local</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let tables = JSON.parse(localStorage.getItem("tableCreatorTables") || "{}");
+    let columns = [];
+    let currentTable = null;
+
+    $(document).ready(function () {
+      renderTableList();
+    });
+
+    // Create new table
+    $("#createTable").click(function () {
+      const name = $("#tableName").val().trim();
+      if (!name) return showMessage("Please enter a table name.");
+      if (tables[name]) {
+        showMessage("Table already exists! Loading it...");
+        loadTable(name);
+        return;
+      }
+
+      tables[name] = { columns: [], data: [] };
+      currentTable = name;
+      columns = [];
+      renderTable();
+      $("#tableBuilder").removeClass("hidden");
+      $("#tableContainer, #exportButtons").addClass("hidden");
+      renderTableList();
+    });
+
+    // Render list of saved tables
+    function renderTableList() {
+      const list = $("#tableList");
+      list.empty();
+
+      const names = Object.keys(tables);
+      if (names.length === 0) {
+        $("#tableListContainer").addClass("hidden");
+        return;
+      }
+
+      $("#tableListContainer").removeClass("hidden");
+
+      names.forEach((name) => {
+        const btn = $(`<button class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded">${name}</button>`);
+        btn.click(() => loadTable(name));
+        list.append(btn);
+      });
+    }
+
+    // Load existing table
+    function loadTable(name) {
+      currentTable = name;
+      const t = tables[name];
+      columns = t.columns;
+      renderTable();
+      renderData(t.data);
+      $("#tableBuilder").removeClass("hidden");
+      $("#tableContainer, #exportButtons").removeClass("hidden");
+    }
+
+    // Add column
+    $("#addColumn").click(function () {
+      const colName = $("#colName").val().trim();
+      const colType = $("#colType").val().trim();
+      if (!colName || !colType) return showMessage("Please enter column name and type");
+
+      columns.push({
+        name: colName,
+        type: colType,
+        pk: $("#colPK").val() === "true",
+        unique: $("#colUnique").val() === "true",
+        nullable: $("#colNull").val() === "true",
+      });
+
+      renderTable();
+      $("#tableContainer, #exportButtons").removeClass("hidden");
+      $("#colName, #colType").val("");
+    });
+
+    // Render Table Header
+    function renderTable() {
+      const thead = $("#dataTable thead");
+      const tbody = $("#dataTable tbody");
+      thead.empty().append("<tr>" + columns.map(c => `<th class='border p-2'>${c.name}</th>`).join("") + "</tr>");
+      tbody.empty();
+    }
+
+    // Render existing data
+    function renderData(data) {
+      const tbody = $("#dataTable tbody");
+      tbody.empty();
+      data.forEach(rowData => {
+        const row = $("<tr></tr>");
+        columns.forEach(col => {
+          const val = rowData[col.name] || "";
+          row.append(`<td class="border p-2"><input type="text" value="${val}" class="w-full p-1 border rounded-md dark:bg-gray-800"></td>`);
+        });
+        tbody.append(row);
+      });
+    }
+
+    // Add row
+    $("#addRow").click(function () {
+      const tbody = $("#dataTable tbody");
+      const row = $("<tr></tr>");
+      columns.forEach(() => {
+        row.append(`<td class="border p-2"><input type="text" class="w-full p-1 border rounded-md dark:bg-gray-800"></td>`);
+      });
+      tbody.append(row);
+    });
+
+    // Export handlers
+    $(".export-btn").click(function () {
+      const type = $(this).data("type");
+      const tableName = currentTable || $("#tableName").val() || "my_table";
+
+      const data = collectData();
+
+      let output = "";
+      if (type === "html") {
+        output = $("#dataTable")[0].outerHTML;
+        download(output, tableName + ".html", "text/html");
+      } else if (type === "json") {
+        output = JSON.stringify({ table: tableName, columns, data }, null, 2);
+        download(output, tableName + ".json", "application/json");
+      } else if (type === "xml") {
+        output = `<table name="${tableName}">\n` +
+          data.map(row => `  <row>${Object.entries(row).map(([k, v]) => `<${k}>${v}</${k}>`).join("")}</row>`).join("\n") +
+          `\n</table>`;
+        download(output, tableName + ".xml", "application/xml");
+      } else if (type === "sql") {
+        const create = `CREATE TABLE ${tableName} (\n` +
+          columns.map(c =>
+            `  ${c.name} ${c.type}` +
+            (c.pk ? " PRIMARY KEY" : "") +
+            (c.unique ? " UNIQUE" : "") +
+            (!c.nullable ? " NOT NULL" : "")
+          ).join(",\n") +
+          `\n);`;
+        const inserts = data.map(row =>
+          `INSERT INTO ${tableName} (${Object.keys(row).join(", ")}) VALUES (${Object.values(row).map(v => `'${v}'`).join(", ")});`
+        ).join("\n");
+        output = create + "\n\n" + inserts;
+        download(output, tableName + ".sql", "text/sql");
+      }
+    });
+
+    // Save to localStorage
+    $("#saveLocal").click(function () {
+      if (!currentTable) return showMessage("Please create or select a table first.");
+
+      const data = collectData();
+      tables[currentTable] = { columns, data };
+      localStorage.setItem("tableCreatorTables", JSON.stringify(tables));
+      showMessage(`Table "${currentTable}" saved to localStorage.`,'success');
+      renderTableList();
+    });
+
+    // Helper: collect data from table
+    function collectData() {
+      const data = [];
+      $("#dataTable tbody tr").each(function () {
+        const row = {};
+        $(this).find("td input").each(function (i) {
+          row[columns[i].name] = $(this).val();
+        });
+        data.push(row);
+      });
+      return data;
+    }
+
+    // Download helper
+    function download(content, fileName, contentType) {
+      const blob = new Blob([content], { type: contentType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</div>

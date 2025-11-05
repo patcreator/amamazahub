@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <!-- <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" /> -->
+
+
+  <!-- Dropzone JS + CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    };
+  </script>
+
+
+
+  <style>
+    *{
+      accent-color: #f90909;
+    }
+    .masonry {
+      column-count: 4;
+      column-gap: 1rem;
+    }
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 1rem;
+      display: inline-block;
+      width: 100%;
+    }
+    @media (max-width: 1024px) {
+      .masonry {
+        column-count: 3;
+      }
+    }
+    @media (max-width: 768px) {
+      .masonry {
+        column-count: 2;
+      }
+    }
+    @media (max-width: 480px) {
+      .masonry {
+        column-count: 1;
+      }
+    }
+    .sidebar-open {
+      transform: translateX(0) !important;
+    }
+    .dropdown-content {
+      display: none;
+    }
+    .dropdown-open .dropdown-content {
+      display: block;
+    }
+  </style>
+  <style>
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    #tab-print, #tab-print * {
+      visibility: visible;
+    }
+
+    #tab-print {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    .no-print {
+      display: none !important;
+    }
+  }
+</style>
+<style>
+
+/* Opt-in to customizable styling */
+select,
+::picker(select) {
+  appearance: base-select;
+  width: initial;
+}
+
+/* Style the select button */
+select {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 4px;
+
+}
+
+/* Style the dropdown menu (the picker) */
+::picker(select) {
+  border: 1px solid transparent;
+  background: #f9f9f9;
+  border-radius: 4px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the options within the menu */
+option {
+  padding: 8px 12px;
+  background: white;
+}
+
+/* Highlight options on hover or focus */
+option:hover,
+option:focus {
+  background: #e0e0e0;
+}
+::picker-icon{
+    content: '';
+    color: rgba(0, 0, 0, 1.0);
+}
+::checkmark{
+    content: '*';
+    color: red;
+}
+
+/* Scrollbar styling for WebKit browsers (Chrome, Safari, Edge) */
+.scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Tailwind gray-100 */
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: #6b7280; /* Tailwind gray-500 */
+  border-radius: 9999px;
+  /*border: 2px solid #f3f4f6;*/
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #374151; /* Tailwind gray-700 */
+}
+
+/* Firefox scrollbar */
+html {
+  /*scrollbar-width: thin;*/
+  scrollbar-color: #6b7280 transparent;
+}
+
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<!-- Material Design Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
+
+<!-- Unicons -->
+<link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+
+<!-- Dripicons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dripicons/webfont/webfont.css">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Description..."/>
+  <meta name="keywords" content="dashboard, rwanda, africa, world"/>
+  <meta name="author" content="patcreator" />
+
+  <!-- Open Graph / Facebook / WhatsApp -->
+  <meta property="og:title" content="PDO "/>
+  <meta property="og:description" content="Description..."/>
+  <meta property="og:image" content="https://example.com/app/settings/preview.jpg"/>
+  <meta property="og:url" content="https://example.com/"/>
+  <meta property="og:type" content="website"/>
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="403"/>
+  <meta name="twitter:description" content="Description..."/>
+  <meta name="twitter:image" content="https://example.com/app/settings/preview.jpg"/>
+  <meta name="twitter:site" content="@patcreator"/>
+
+  <!-- App / Mobile Support -->
+  <meta name="theme-color" content="#ffffff"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="PDT0"/>
+  <link rel="manifest" href="/pdt0/manifest.json"/>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/pdt0/app/system/filemanager/favicons/favicon-32x32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="/pdt0/app/system/filemanager/favicons/favicon-16x16.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/pdt0/app/system/filemanager/favicons/apple-touch-icon.png"/>
+  <link rel="mask-icon" href="/pdt0/app/system/filemanager/favicons/safari-pinned-tab.svg" color="#e60023"/>
+  <meta name="msapplication-TileColor" content="#ffffff"/>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+  <!-- HEADER -->
+  <header class="fixed top-0 left-0 w-full z-30 bg-white dark:bg-gray-800 shadow px-4 py-2 flex items-center justify-between">
+    <div class="flex">
+
+      <button class="hover:bg-gray-100 p-2 rounded-full px-3 hover:text-red-500" onclick="toggleIcons()"><i class="dripicons-menu"></i></button>
+    <!-- Logo -->
+    <a href = '/pdt0/' class="flex items-center space-x-2">
+      <span class="text-xl font-bold text-gray-800 dark:text-white">403</span>
+    </a>
+    </div>
+
+    
+<script>
+  function toggleIcons() {
+    $('[data-txt]').toggleClass('hidden');$('#sidebar').toggleClass('w-64');$('#dashboardSection').toggleClass('max-w-4xl w-full');$('#main-content').toggleClass('md:ml-64 md:ml-32');
+    $.post('app/api/toggleSessions.php',{icons:true});
+  }
+</script>
+
+
+
+
+
+
+<!-- Search Container -->
+<div class="flex-1 mx-4 max-w-2xl relative">
+  <div class="relative w-full">
+    <!-- Search Input -->
+    <input
+      id="headerSearchInput"
+      type="text"
+      placeholder="Search"
+      class="w-full pl-4 pr-12 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+    />
+
+    <!-- Voice Search Button -->
+    <button
+      id="voiceSearchBtn"
+      class="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300 hover:text-red-500"
+      title="Search by voice"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2m7 8v4m-4 0h8" />
+      </svg>
+    </button>
+
+    <!-- Search Button -->
+    <button
+      id="headerSearchBtn"
+      class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300 hover:text-red-500"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Dropdown -->
+  <div
+    id="searchDropdown"
+    class="hidden absolute left-0 top-full mt-1 w-full bg-white dark:bg-gray-800 shadow rounded-lg z-50"
+  >
+    <ul id="searchResults"></ul>
+  </div>
+</div>
+
+<script>
+  const input = document.getElementById('headerSearchInput');
+  const dropdown = document.getElementById('searchDropdown');
+  const resultsList = document.getElementById('searchResults');
+  const voiceBtn = document.getElementById('voiceSearchBtn');
+
+  // --- Live Search (AJAX to backend) ---
+  input.addEventListener('input', async () => {
+    const query = input.value.trim();
+    if (query.length < 2) {
+      dropdown.classList.add('hidden');
+      return;
+    }
+
+    // Fetch top 5 results from backend
+    const res = await fetch(`/pdt0/search_suggestions?q=${encodeURIComponent(query)}`);
+    const results = await res.json();
+
+    resultsList.innerHTML = results
+      .map(
+        (r) => `
+        <li>
+          <a href="${r.url}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <span class="font-semibold">${r.title}</span>
+            <span class="block text-sm text-gray-500">${r.keywords}</span>
+          </a>
+        </li>`
+      )
+      .join('');
+
+    dropdown.classList.remove('hidden');
+  });
+
+  // Hide dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.relative')) dropdown.classList.add('hidden');
+  });
+
+  // --- Voice Search ---
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+
+    voiceBtn.addEventListener('click', () => {
+      recognition.start();
+      voiceBtn.classList.add('text-red-500');
+    });
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      input.value = transcript;
+      voiceBtn.classList.remove('text-red-500');
+      input.dispatchEvent(new Event('input')); // Trigger search
+    };
+
+    recognition.onerror = () => {
+      voiceBtn.classList.remove('text-red-500');
+      showMessage('Raise your tone...');
+    };
+  } else {
+    voiceBtn.style.display = 'none';
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Right: icons -->
+    <div class="flex items-center space-x-3">
+      <!-- Create icon -->
+      <a href="/pdt0/s/Create" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+        <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+      </a>
+
+
+
+
+
+
+
+
+      <!-- Notification -->
+      <div class="relative">
+        <button id="notifBtn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+          <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </button>
+        <div id="notifDropdown" class="dropdown-content absolute right-0 top-full mt-1 w-60 bg-white dark:bg-gray-800 shadow-3xl border dark:border-gray-700 rounded-lg">
+          <div>
+            <a href="/pdt0/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-lg rounded-b-none">Notification Notification 1</a>
+            <a href="/pdt0/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Notification Notification 2</a>
+            <a href="/pdt0/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-none rounded-b-lg">Notification Notification 3</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div class="relative">
+        <button id="profileBtn" class="p-1 rounded-full hover:ring-2 ring-red-500">
+          <i class="fa fa-user"></i>
+        </button>
+        <div id="profileDropdown" class="dropdown-content absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 shadow-lg dark:border-gray-700 border rounded-lg">
+          <div>
+            <a href="/pdt0/s/profile" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-lg rounded-b-none">
+            <i class="mdi mdi-account me-3"></i> Profile</a>
+            <a href="/pdt0/s/settings" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <i class="mdi mdi-cogs me-3"></i> Settings</a>
+            <a href="/pdt0/s/explore" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <i class="mdi mdi-robot me-3"></i> Explore</a>
+            <div class="border-t border-gray-200 dark:border-gray-700"></div>
+            <a href="/pdt0/s/report" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <i class="mdi mdi-history me-3"></i> Report history</a>
+            <a href="/pdt0/s/help" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer
+              "><i class="mdi mdi-help me-3"></i> Help</a>
+            <a href="/pdt0/s/feedback" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <i class="mdi mdi-message me-3"></i> Send feedback</a>
+            <a href="/pdt0/logout/" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-none rounded-b-lg">
+            <i class="mdi mdi-logout me-3"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <button id="sidebarToggle" class="md:hidden fixed top-16 left-4 z-30 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+<!-- Lucide CDN -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<nav style="margin-top:56px;" id="sidebar" class="fixed left-0 top-0 h-[91%]   bg-white dark:bg-gray-800 shadow-lg z-20 transform-translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto scrollbar">
+  <div class="p-4">
+    <ul class="space-y-2">
+        <!-- Extra Section -->
+      <li class="mt-4"><span class="text-gray-500 dark:text-gray-400 uppercase text-xs">Extra</span></li>
+
+      <li>
+        <a title="Dashboard" href="/pdt0/s/Dashboard" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Dashboard" data-lucide="home" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Dashboard</span>
+
+        </a>
+      </li>
+
+      <li>
+        <a title="Search" href="/pdt0/s/Search" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Search" data-lucide="search" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Search</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="Create" href="/pdt0/s/Create" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Create" data-lucide="plus-square" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Create</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="Content" href="/pdt0/s/Content" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Content" data-lucide="file-text" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Content</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="Analytics" href="/pdt0/s/Analytics" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Analytics" data-lucide="bar-chart-2" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Analytics</span>
+        </a>
+      </li>
+      <!-- You Section -->
+      <li><span class="text-gray-500 dark:text-gray-400 uppercase text-xs">You</span></li>
+
+      <li>
+        <a title="History" href="/pdt0/s/History" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="History" data-lucide="list" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">History</span>
+        </a>
+      </li>
+
+      <!-- Your Section -->
+      <li class="mt-4"><span class="text-gray-500 dark:text-gray-400 uppercase text-xs">Your</span></li>
+
+      <li>
+        <a title="Profile" href="/pdt0/s/Profile" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Profile" data-lucide="user" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Profile</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="Settings" href="/pdt0/s/Settings" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Settings" data-lucide="settings" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Settings</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="Explore" href="/pdt0/s/Explore" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Explore" data-lucide="compass" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Explore</span>
+        </a>
+      </li>
+
+      <!-- Settings Section -->
+      <li class="mt-4"><span class="text-gray-500 dark:text-gray-400 uppercase text-xs">Settings</span></li>
+
+      <li>
+        <a title="Report" href="/pdt0/s/Report" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Report" data-lucide="flag" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Report</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="Help" href="/pdt0/s/Help" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Help" data-lucide="help-circle" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Help</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="Send" href="/pdt0/s/feedback" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Send feedback" data-lucide="message-square" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class="">Send feedback</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="Sql runner" href="/pdt0/s/query" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Sql runner" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 fa fa-code"></i>
+
+          <span data-txt class="">SQL runner</span>
+        </a>
+      </li>
+
+      <li>
+        <a title="File Manager" href="/pdt0/s/filemanager" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="File Manager" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 fa fa-folder"></i>
+
+          <span data-txt class="">File Manager</span>
+        </a>
+      </li>
+      <li>
+        <a title="cmd" href="/pdt0/s/cmd" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="cmd" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 fa fa-terminal"></i>
+
+          <span data-txt class="">CMD</span>
+        </a>
+      </li>
+
+      <li>
+        <button title="Dark Mode" id="darkModeToggle" class="flex items-center w-full px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i title="Dark Mode" data-lucide="moon" id="darkModeIcon" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
+
+          <span data-txt class=""><span id="darkModeText">Dark Mode</span></span>
+        </button>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<script>
+  lucide.createIcons();
+</script>
+
+
+  <!-- overlay for mobile -->
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden md:hidden"></div>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+<section class="bg-white dark:bg-gray-900 h-screen">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+        <div class="mx-auto max-w-screen-sm text-center mt-32">
+            <h1 class="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-red-600 dark:text-primary-500">403</h1>
+            <p class="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">Forbidden.</p>
+            <p class="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">You don't have permission to access this resource. </p>
+            <a href="/pdt0/" class="inline-flex text-white bg-primary-600 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 my-4">Back to Homepage</a>
+        </div>   
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+<!-- FOOTER -->
+ <footer class="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 mt-8  hidden">
+    <div class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div>
+        <h3 class="font-semibold mb-2">company name</h3>
+        <ul>
+          <li><a href="#" class="hover:text-red-500">About</a></li>
+          <li><a href="#" class="hover:text-red-500">Press</a></li>
+          <li><a href="#" class="hover:text-red-500">Contact us</a></li>
+          <li><a href="#" class="hover:text-red-500">Creators</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-2">More</h3>
+        <ul>
+          <li><a href="#" class="hover:text-red-500">Advertise</a></li>
+          <li><a href="#" class="hover:text-red-500">Developers</a></li>
+          <li><a href="#" class="hover:text-red-500">Terms</a></li>
+          <li><a href="#" class="hover:text-red-500">Privacy Policy & Safety</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-2">How it works</h3>
+        <ul>
+          <li><a href="#" class="hover:text-red-500">How this website works</a></li>
+          <li><a href="#" class="hover:text-red-500">Test new features</a></li>
+        </ul>
+      </div>
+      <div class="col-span-1 sm:col-span-2 lg:col-span-1 flex items-end justify-center lg:justify-end">
+        <p class="text-sm">&copy; 2025 Company</p>
+      </div>
+    </div>
+  </footer>
+
+
+
+ <!-- Alert Container -->
+<div id="alert-container" class="z-50 fixed top-10 left-0 w-full text-center"></div>
+
+<!-- Heroicons CDN -->
+<script src="https://unpkg.com/heroicons@2.0.18/dist/heroicons.min.js"></script>
+
+<script>
+  const colors = {
+    success: 'bg-green-500 text-white',
+    error: 'bg-red-500 text-white',
+    warning: 'bg-yellow-400 text-black',
+    info: 'bg-blue-500 text-white',
+    dark: 'bg-gray-800 text-white',
+    light: 'bg-gray-200 text-black'
+  };
+
+const icons = {
+    success: `<span class="inline-flex items-center justify-center h-4 w-4 rounded-full border-1 border border-current mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </span>`,
+    error: `<span class="inline-flex items-center justify-center h-4 w-4 rounded-full border-1 border border-current mr-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </span>`,
+    warning: `<span class="inline-flex items-center justify-center h-4 w-4 rounded-full border-1 border border-current mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 2a10 10 0 11-10 10A10 10 0 0112 2z" />
+                </svg>
+              </span>`,
+    info: `<span class="inline-flex items-center justify-center h-4 w-4 rounded-full border-1 border border-current mr-2">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10 10 0 0012 2z" />
+             </svg>
+           </span>`,
+    light: `<span class="inline-flex items-center justify-center h-4 w-4 rounded-full border-1 border border-current mr-2">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10 10 0 0012 2z" />
+             </svg>
+           </span>`,
+    dark: `<span class="inline-flex items-center justify-center h-4 w-4 rounded-full border-1 border border-current mr-2">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10 10 0 0012 2z" />
+             </svg>
+           </span>`
+  };
+
+  function showMessage(message, type = 'error', time = 2000) {
+    const alertContainer = document.getElementById('alert-container');
+    const alert = document.createElement('span');
+    alert.className = `shadow-lg transform transition-all duration-300 translate-y-[-20px] rounded-lg px-4 py-2 mb-3 inline-flex items-center justify-center ${colors[type] || colors.info}`;
+    alert.innerHTML = `${icons[type] || ''}${message}`;
+
+    alertContainer.appendChild(alert);
+    alertContainer.classList.remove('opacity-0');
+    // Show animation
+    setTimeout(() => alertContainer.classList.add('opacity-100'), 10);
+
+    // Hide after timeout
+    setTimeout(() => {
+       alertContainer.classList.add('opacity-0');
+       alertContainer.innerHTML = '';
+    }, time);
+  }
+</script>
+
+
+
+  <!-- SCRIPTS -->
+  <script>
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.add('sidebar-open');
+      overlay.classList.remove('hidden');
+      sidebarToggle.classList.add('hidden');
+    });
+    function closeSidebar() {
+      sidebar.classList.remove('sidebar-open');
+      overlay.classList.add('hidden');
+      sidebarToggle.classList.remove('hidden');
+    }
+    overlay.addEventListener('click', closeSidebar);
+
+    // Dropdown toggles
+    const headerSearchInput = document.getElementById('headerSearchInput');
+    const searchDropdown = document.getElementById('searchDropdown');
+    headerSearchInput.addEventListener('focus', () => {
+      searchDropdown.parentElement.classList.add('dropdown-open');
+    });
+    headerSearchInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        searchDropdown.parentElement.classList.remove('dropdown-open');
+      }, 200);
+    });
+
+    const notifBtn = document.getElementById('notifBtn');
+    const notifDropdown = document.getElementById('notifDropdown');
+    notifBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      notifDropdown.parentElement.classList.toggle('dropdown-open');
+      profileDropdown.parentElement.classList.remove('dropdown-open');
+    });
+
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    profileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.parentElement.classList.toggle('dropdown-open');
+      notifDropdown.parentElement.classList.remove('dropdown-open');
+    });
+
+    window.addEventListener('click', () => {
+      notifDropdown.parentElement.classList.remove('dropdown-open');
+      profileDropdown.parentElement.classList.remove('dropdown-open');
+    });
+
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+
+
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+darkModeToggle.addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+
+  // Save preference in localStorage
+  if (document.documentElement.classList.contains('dark')) {
+    localStorage.setItem('theme', 'dark');
+  } else {
+    localStorage.setItem('theme', 'light');
+  }
+});
+
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <?php  include 'app/api/ajax.php'; ?>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/pdt0/service-worker.js")
+      .then(() => console.log("Service Worker registered"))
+      .catch(err => console.error("SW failed:", err));
+  }
+</script>
+
+</body>
+</html>

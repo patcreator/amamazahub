@@ -1,0 +1,157 @@
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<div class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen p-6 transition-colors duration-300">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header -->
+    <header class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-3">
+      <h1 class="text-2xl font-bold"><i class="mdi mdi-cogs"></i> Website Settings</h1>
+    </header>
+
+    <!-- Accordion -->
+    <div x-data="{ open: 1 }" class="space-y-4">
+
+      <!-- General Settings -->
+      <div class="border dark:border-gray-700 rounded-lg">
+        <button @click="open === 1 ? open = null : open = 1" class="w-full text-left px-4 py-3 bg-gray-100 dark:bg-gray-800 font-semibold flex justify-between items-center">
+          General Settings <span x-text="open === 1 ? '−' : '+'"></span>
+        </button>
+        <div x-show="open === 1" x-collapse class="p-4 space-y-4 bg-white dark:bg-gray-900">
+          <div>
+            <label class="block font-medium">Website Name</label>
+            <input type="text" placeholder="My Website" class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+          </div>
+
+          <div>
+            <label class="block font-medium">Website Description</label>
+            <textarea placeholder="Describe your site..." class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium">Website Author</label>
+              <input type="text" placeholder="Author name" class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+            </div>
+            <div>
+              <label class="block font-medium">Base URL</label>
+              <input type="url" placeholder="https://example.com" class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-medium">Keywords</label>
+            <input type="text" placeholder="website, blog, tech" class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+          </div>
+        </div>
+      </div>
+
+      <!-- Branding -->
+      <div class="border dark:border-gray-700 rounded-lg">
+        <button @click="open === 2 ? open = null : open = 2" class="w-full text-left px-4 py-3 bg-gray-100 dark:bg-gray-800 font-semibold flex justify-between items-center">
+          Branding & Icons <span x-text="open === 2 ? '−' : '+'"></span>
+        </button>
+        <div x-show="open === 2" x-collapse class="p-4 space-y-4 bg-white dark:bg-gray-900">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium">Logo (Icon)</label>
+              <input type="file" class="mt-1 w-full border dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-800">
+            </div>
+            <div>
+              <label class="block font-medium">Logo with Text</label>
+              <input type="file" class="mt-1 w-full border dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-800">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-medium">Favicon</label>
+            <input type="file" class="mt-1 w-full border dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-800">
+            <p class="text-sm mt-1 text-gray-500">Include light/dark favicons (e.g., favicon-light.png, favicon-dark.png)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layout Settings -->
+      <div class="border dark:border-gray-700 rounded-lg">
+        <button @click="open === 3 ? open = null : open = 3" class="w-full text-left px-4 py-3 bg-gray-100 dark:bg-gray-800 font-semibold flex justify-between items-center">
+          Layout & Display <span x-text="open === 3 ? '−' : '+'"></span>
+        </button>
+        <div x-show="open === 3" x-collapse class="p-4 space-y-4 bg-white dark:bg-gray-900">
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" class="rounded">
+              <span>Show/Hide Icons</span>
+            </label>
+
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" x-model="sidebar" class="rounded">
+              <span>Toggle Sidebar</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="block font-medium">Accent Color</label>
+            <input type="color" value="#3b82f6" class="mt-1 w-24 h-10 border dark:border-gray-700 rounded-lg">
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block font-medium">Font Family</label>
+              <select class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+                <option>Inter</option>
+                <option>Roboto</option>
+                <option>Poppins</option>
+                <option>Open Sans</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-medium">Font Size</label>
+              <input type="number" value="16" class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+            </div>
+
+            <div>
+              <label class="block font-medium">Font Color</label>
+              <input type="color" value="#111827" class="mt-1 w-full h-10 border dark:border-gray-700 rounded-lg">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium">Sidebar Color</label>
+              <input type="color" value="#1f2937" class="mt-1 w-full h-10 border dark:border-gray-700 rounded-lg">
+            </div>
+            <div>
+              <label class="block font-medium">Header Color</label>
+              <input type="color" value="#111827" class="mt-1 w-full h-10 border dark:border-gray-700 rounded-lg">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Policy & Pages -->
+      <div class="border dark:border-gray-700 rounded-lg">
+        <button @click="open === 4 ? open = null : open = 4" class="w-full text-left px-4 py-3 bg-gray-100 dark:bg-gray-800 font-semibold flex justify-between items-center">
+          Pages & Legal <span x-text="open === 4 ? '−' : '+'"></span>
+        </button>
+        <div x-show="open === 4" x-collapse class="p-4 space-y-4 bg-white dark:bg-gray-900">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium">Policy Page URL</label>
+              <input type="url" placeholder="/policy" class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+            </div>
+            <div>
+              <label class="block font-medium">Terms & Conditions Page URL</label>
+              <input type="url" placeholder="/terms" class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-medium">About Us Page URL</label>
+            <input type="url" placeholder="/about" class="mt-1 w-full rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

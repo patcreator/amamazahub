@@ -1,0 +1,173 @@
+{
+    "database": "1000hills",
+    "company": {
+        "name": "company name"
+    },
+    "project": {
+        "name": "IcyizereConnect",
+        "description": "This proect is all about  content managment system"
+    },
+    "config": {
+        "programming_language": "php-pdo",
+        "styling": "tailwind",
+        "primary_color": "#002bee",
+        "accent_color": "#009bee",
+        "font_family": "Arial"
+    },
+    "pdt": {
+        "tables": {
+            "contacts": {
+                "query": "SELECT * FROM `contacts`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "feedback": {
+                "query": "SELECT * FROM `feedback`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "help_articles": {
+                "query": "SELECT * FROM `help_articles`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "help_topics": {
+                "query": "SELECT * FROM `help_topics`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "history": {
+                "query": "SELECT * FROM `history`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "jobs": {
+                "query": "SELECT * FROM `jobs`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "notes": {
+                "query": "SELECT * FROM `notes`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "notifications": {
+                "query": "SELECT * FROM `notifications`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "pdt_districtcoordinator": {
+                "query": "SELECT * FROM `pdt_districtcoordinator`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "pdt_provincecoordinator": {
+                "query": "SELECT * FROM `pdt_provincecoordinator`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "pdt_sectorcoordinator": {
+                "query": "SELECT * FROM `pdt_sectorcoordinator`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "pdt_super_admin": {
+                "query": "SELECT * FROM `pdt_super_admin`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "search_index": {
+                "query": "SELECT * FROM `search_index`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "settings": {
+                "query": "SELECT * FROM `settings`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "subscribers": {
+                "query": "SELECT * FROM `subscribers`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "todos": {
+                "query": "SELECT * FROM `todos`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "user_activity": {
+                "query": "SELECT * FROM `user_activity`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "user_profile": {
+                "query": "SELECT * FROM `user_profile`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            },
+            "users": {
+                "query": "SELECT * FROM `users`",
+                "delete": true,
+                "update": true,
+                "select": true,
+                "insert": true,
+                "charts": true
+            }
+        }
+    }
+}

@@ -1,0 +1,1 @@
+<div class="bg-black text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur fuga quam, unde, adipisci laboriosam ut eveniet facere dignissimos vitae error dolor magnam ipsum quos corporis obcaecati dolore quas tempora eius?</div>

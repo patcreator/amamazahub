@@ -1,0 +1,254 @@
+
+  <style>
+    /* small scrollbar style for list */
+    .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+  </style>
+<div class="bg-gray-100 dark:bg-gray-800 min-h-screen p-6">
+  <div class="max-w-3xl mx-auto">
+
+    <div class="bg-white dark:bg-gray-700/50 dark:border-gray-700 p-4 rounded-lg shadow mb-4">
+      <form id="alarmForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+        <div class="col-span-1 sm:col-span-2">
+          <label class="text-sm block mb-1">Date & time</label>
+          <input id="alarmTime" type="datetime-local" class="w-full border rounded p-2 dark:bg-gray-700/75 dark:border-gray-700" required />
+        </div>
+        <div>
+          <label class="text-sm block mb-1">Label</label>
+          <input id="alarmLabel" type="text" placeholder="Wake up" class="w-full border rounded p-2 dark:bg-gray-700/75 dark:border-gray-700" />
+        </div>
+        <div class="sm:col-span-3 flex gap-2 mt-2">
+          <button id="addAlarm" type="submit" class=" dark:bg-gray-700  dark:text-white bg-gray-200 text-gray-800 px-4 py-2 rounded"><i class="mdi mdi-plus"></i> Add</button>
+          <button id="requestNotif" title="Enable Notifications" type="button" class="bg-red-500 text-white px-4 py-2 rounded"><i class="mdi mdi-bell"></i></button>
+        </div>
+      </form>
+    </div>
+
+    <div class="bg-white dark:bg-gray-700/50 dark:border-gray-700 p-4 rounded-lg shadow">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-medium">Alarms</h2>
+      </div>
+
+      <div id="alarmsList" class="space-y-2 max-h-72 overflow-auto scrollbar-thin"></div>
+
+      <template id="alarmTemplate">
+        <div class="alarm-item bg-gray-50 dark:bg-gray-700 dark:border-gray-700 border rounded p-3 flex items-start justify-between">
+          <div>
+            <div class="text-sm alarm-label font-semibold"></div>
+            <div class="text-xs text-gray-600 dark:text-gray-100 alarm-time"></div>
+            <div class="text-xs mt-1"><span class="badge-status px-2 py-0.5 rounded text-xs"></span> <span class="played text-gray-500 dark:text-gray-200 text-xs ml-2"></span></div>
+          </div>
+          <div class="flex gap-2">
+            <button title="Edit" class="edit-btn dark:bg-gray-700 bg-gray-50 text-950 dark:text-white px-3 py-1 rounded text-sm"><i class="mdi mdi-pen"></i></button>
+            <button class="toggle-btn dark:bg-gray-600 bg-gray-50 text-950 dark:text-white px-3 py-1 rounded text-sm" title="Toggle"><i class="mdi mdi-toggle-switch-off"></i></button>
+            <button title="delete" class="delete-btn bg-red-500 text-white px-3 py-1 rounded text-sm"><i class="mdi mdi-delete"></i></button>
+          </div>
+        </div>
+      </template>
+    </div>
+
+  </div>
+
+  <script>
+    // Alarm manager using localStorage key 'alarms'
+    // Each alarm: { id, timeISO, label, active: true/false, played: true/false }
+
+    const STORAGE_KEY = 'alarms';
+    const SOUND_PATH = '/PDT-NEW/projects/pdo/app/system/filemanager/sounds/Alarm01.wav'; // change if needed
+    const CHECK_INTERVAL = 1000; // ms
+
+    // Create audio element
+    const alarmAudio = new Audio(SOUND_PATH);
+    alarmAudio.preload = 'auto';
+
+    function loadAlarms() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        console.error('Failed to parse alarms', e);
+        return [];
+      }
+    }
+
+    function saveAlarms(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function renderAlarms() {
+      const list = loadAlarms();
+      const $container = $('#alarmsList');
+      $container.empty();
+      if (!list.length) {
+        $container.append('<div class="text-sm text-gray-500">No alarms set</div>');
+        return;
+      }
+
+      list.sort((a,b)=> new Date(a.timeISO) - new Date(b.timeISO));
+
+      list.forEach(alarm => {
+        const $tpl = $($('#alarmTemplate').html());
+        $tpl.find('.alarm-label').text(alarm.label || 'Alarm');
+        const timeText = new Date(alarm.timeISO).toLocaleString();
+        $tpl.find('.alarm-time').text(timeText);
+        const $status = $tpl.find('.badge-status');
+        $status.text(alarm.active ? 'ON' : 'OFF');
+        $status.toggleClass('bg-green-200 text-green-800', alarm.active);
+        $status.toggleClass('bg-gray-200 text-gray-600', !alarm.active);
+        $tpl.find('.played').text(alarm.played ? '(played)' : '');
+
+        $tpl.find('.delete-btn').on('click', ()=>{
+          removeAlarm(alarm.id);
+        });
+
+        $tpl.find('.toggle-btn').on('click', ()=>{
+          toggleAlarm(alarm.id);
+        });
+
+        $tpl.find('.edit-btn').on('click', ()=>{
+          openEditPrompt(alarm.id);
+        });
+
+        $container.append($tpl);
+      });
+    }
+
+    function addAlarm(timeISO, label) {
+      const list = loadAlarms();
+      const alarm = { id: Date.now() + Math.random(), timeISO, label, active: true, played: false };
+      list.push(alarm);
+      saveAlarms(list);
+      renderAlarms();
+    }
+
+    function removeAlarm(id) {
+      let list = loadAlarms();
+      list = list.filter(a=>a.id !== id);
+      saveAlarms(list);
+      renderAlarms();
+    }
+
+    function toggleAlarm(id) {
+      const list = loadAlarms();
+      const idx = list.findIndex(a=>a.id===id);
+      if (idx===-1) return;
+      list[idx].active = !list[idx].active;
+      saveAlarms(list);
+      renderAlarms();
+    }
+
+    function editAlarm(id, newTimeISO, newLabel) {
+      const list = loadAlarms();
+      const idx = list.findIndex(a=>a.id===id);
+      if (idx===-1) return;
+      list[idx].timeISO = newTimeISO;
+      list[idx].label = newLabel;
+      list[idx].played = false; // reset played state when edited
+      list[idx].active = true;
+      saveAlarms(list);
+      renderAlarms();
+    }
+
+    function openEditPrompt(id) {
+      const list = loadAlarms();
+      const alarm = list.find(a=>a.id===id);
+      if (!alarm) return;
+      const newTime = prompt('Edit date/time (YYYY-MM-DDTHH:MM):', alarm.timeISO.slice(0,16));
+      if (!newTime) return;
+      const newLabel = prompt('Edit label:', alarm.label || 'Alarm');
+      const iso = new Date(newTime).toISOString();
+      if (isNaN(new Date(iso))) {
+        showMessage('Invalid date');
+        return;
+      }
+      editAlarm(id, iso, newLabel);
+    }
+
+    // Detect and trigger alarms
+    function checkAlarms() {
+      const now = new Date();
+      const list = loadAlarms();
+      let changed = false;
+      list.forEach(alarm => {
+        if (alarm.active && !alarm.played) {
+          const alarmTime = new Date(alarm.timeISO);
+          if (alarmTime <= now) {
+            // trigger alarm
+            triggerAlarm(alarm);
+            alarm.played = true;
+            alarm.active = false; // change status to off after play
+            changed = true;
+          }
+        }
+      });
+      if (changed) saveAlarms(list);
+      // reflect UI changes
+      renderAlarms();
+    }
+
+    function triggerAlarm(alarm) {
+      // Play sound (promise API)
+      alarmAudio.currentTime = 0;
+      const playPromise = alarmAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn('Autoplay prevented or failed:', err);
+        });
+      }
+
+      // Notification
+      if (window.Notification && Notification.permission === 'granted') {
+        try {
+          new Notification(alarm.label || 'Alarm', {
+            body: `Alarm for ${new Date(alarm.timeISO).toLocaleString()}`
+          });
+        } catch (e) {
+          console.warn('Notification error', e);
+        }
+      }
+
+      // Gentle fallback visual showMessage
+      showMessage(`ALARM: ${alarm.label || 'Alarm'} — ${new Date(alarm.timeISO).toLocaleString()}`);
+    }
+
+    $(function(){
+      // initialize UI
+      renderAlarms();
+
+      // load existing alarms and convert ISO times if needed
+
+      $('#alarmForm').on('submit', function(e){
+        e.preventDefault();
+        const dt = $('#alarmTime').val();
+        if (!dt) return showMessage('Choose date & time');
+        const label = $('#alarmLabel').val() || 'Alarm';
+        // Convert local datetime-local into ISO (browser provides local without timezone)
+        const iso = new Date(dt).toISOString();
+        addAlarm(iso, label);
+        $('#alarmTime').val('');
+        $('#alarmLabel').val('');
+      });
+
+      $('#requestNotif').on('click', function(){
+        if (!('Notification' in window)) return showMessage('Notifications not supported in this browser.');
+        Notification.requestPermission().then(p => {
+          showMessage('Notification permission: ' + p,'success');
+        });
+      });
+
+      // Periodic check
+      setInterval(checkAlarms, CHECK_INTERVAL);
+
+      // Also check once on load to handle missed alarms
+      checkAlarms();
+
+      // Expose some helpers to console for debugging
+      window._alarms = {
+        list: loadAlarms,
+        save: saveAlarms,
+        add: addAlarm,
+        remove: removeAlarm,
+        edit: editAlarm
+      };
+    });
+  </script>
+</div>

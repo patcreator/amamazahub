@@ -1,0 +1,103 @@
+<div class="bg-gray-100 dark:bg-gray-800 min-h-screen flex flex-col items-center p-6">
+
+  <h1 class="text-2xl font-bold mb-6 text-center">📽️ Web Media Player</h1>
+
+  <!-- File Upload -->
+  <div class="mb-6">
+    <input type="file" id="fileInput" accept="audio/*,video/*,image/*" 
+           class="block text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"/>
+  </div>
+
+  <!-- Media Display Area -->
+  <div id="mediaContainer" class="w-full max-w-2xl bg-white p-4 rounded-2xl shadow-md mb-6 flex justify-center items-center min-h-[300px]">
+    <p class="text-gray-400">No media selected</p>
+  </div>
+
+  <!-- History -->
+  <div class="w-full max-w-2xl">
+    <h2 class="text-xl font-semibold mb-3">History</h2>
+    <ul id="historyList" class="bg-white rounded-2xl shadow-md p-4 divide-y divide-gray-100"></ul>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const mediaContainer = document.getElementById('mediaContainer');
+    const historyList = document.getElementById('historyList');
+    let history = [];
+
+    function displayMedia(fileURL, type, name) {
+      mediaContainer.innerHTML = '';
+
+      if (type.startsWith('video')) {
+        const video = document.createElement('video');
+        video.src = fileURL;
+        video.controls = true;
+        video.className = 'max-h-[400px] rounded-lg';
+        mediaContainer.appendChild(video);
+      } 
+      else if (type.startsWith('audio')) {
+        const audio = document.createElement('audio');
+        audio.src = fileURL;
+        audio.controls = true;
+        mediaContainer.appendChild(audio);
+      }
+      else if (type.startsWith('image')) {
+        const img = document.createElement('img');
+        img.src = fileURL;
+        img.alt = name;
+        img.className = 'max-h-[400px] rounded-lg';
+        mediaContainer.appendChild(img);
+      } 
+      else {
+        mediaContainer.textContent = 'Unsupported file type.';
+      }
+    }
+
+    function addToHistory(fileURL, type, name) {
+      const item = { fileURL, type, name };
+      history.unshift(item);
+      updateHistoryUI();
+      saveHistory();
+    }
+
+    function updateHistoryUI() {
+      historyList.innerHTML = '';
+      history.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-md px-2';
+        li.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="text-gray-600">${index + 1}.</span>
+            <span class="font-medium text-blue-600">${item.name}</span>
+          </div>
+          <span class="text-gray-400 text-sm">${item.type.split('/')[0]}</span>
+        `;
+        li.onclick = () => displayMedia(item.fileURL, item.type, item.name);
+        historyList.appendChild(li);
+      });
+    }
+
+    function saveHistory() {
+      localStorage.setItem('mediaHistory', JSON.stringify(history));
+    }
+
+    function loadHistory() {
+      const saved = JSON.parse(localStorage.getItem('mediaHistory')) || [];
+      history = saved;
+      updateHistoryUI();
+    }
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const fileURL = URL.createObjectURL(file);
+        displayMedia(fileURL, file.type, file.name);
+        addToHistory(fileURL, file.type, file.name);
+      }
+    });
+
+    // Initialize
+    loadHistory();
+  </script>
+
+</div>

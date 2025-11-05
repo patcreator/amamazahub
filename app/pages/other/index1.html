@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ibyiza byacu | Serivisi z'ikoranabuhanga za kijyambere</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #4a6741 100%);
+    }
+    
+    .glass-morphism {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    }
+    
+    .floating-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      animation: float-orb 8s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    @keyframes float-orb {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(30px, -30px) rotate(90deg); }
+      50% { transform: translate(-20px, 20px) rotate(180deg); }
+      75% { transform: translate(-30px, -10px) rotate(270deg); }
+    }
+    
+    .hero-3d {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .parallax-element {
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+    }
+    
+    .magnetic-button {
+      transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .magnetic-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .magnetic-button:hover::before {
+      left: 100%;
+    }
+    
+    .text-glow {
+      text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    }
+    
+    .morphing-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transform-style: preserve-3d;
+    }
+    
+    .morphing-card:hover {
+      transform: translateY(-20px) rotateX(5deg) rotateY(5deg);
+    }
+    
+    .progress-ring {
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    
+    .progress-ring-circle {
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .loading-dots {
+      display: inline-block;
+    }
+    
+    .loading-dots::after {
+      content: '';
+      animation: dots 2s linear infinite;
+    }
+    
+    @keyframes dots {
+      0%, 20% { content: ''; }
+      40% { content: '.'; }
+      60% { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
+    
+    .neon-border {
+      position: relative;
+      background: rgba(0,0,0,0.1);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    
+    .neon-border::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: -1;
+      margin: -2px;
+      border-radius: inherit;
+      background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+      animation: rotate-border 4s linear infinite;
+    }
+    
+    @keyframes rotate-border {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .typing-animation {
+      border-right: 2px solid #667eea;
+      animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 50% { border-color: transparent; }
+      51%, 100% { border-color: #667eea; }
+    }
+    
+    .particle-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: radial-gradient(circle, #667eea, transparent);
+      border-radius: 50%;
+      animation: particle-float 6s linear infinite;
+    }
+    
+    @keyframes particle-float {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+    
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+      transform-origin: 0%;
+      z-index: 9999;
+      transition: transform 0.1s ease;
+    }
+    
+    .interactive-cursor {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #667eea;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: all 0.1s ease;
+      mix-blend-mode: difference;
+    }
+    
+    .section-reveal {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+    }
+    
+    .section-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .holographic-card {
+      position: relative;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+    
+    .holographic-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 1s;
+    }
+    
+    .holographic-card:hover::before {
+      left: 100%;
+    }
+    
+    @media (max-width: 768px) {
+      .particle-container { display: none; }
+      .floating-orb { display: none; }
+    }
+    
+    .ai-chat-bubble {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+    }
+  </style>
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+  <!-- Interactive Cursor -->
+  <div class="interactive-cursor" id="cursor"></div>
+  
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+  
+  <!-- Particle System -->
+  <div class="particle-container" id="particleContainer"></div>
+  
+  <!-- Floating Orbs -->
+  <div class="floating-orb w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-400 top-10 -left-48 opacity-20"></div>
+  <div class="floating-orb w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 top-96 -right-40 opacity-20" style="animation-delay: -4s;"></div>
+  <div class="floating-orb w-64 h-64 bg-gradient-to-r from-green-400 to-blue-400 bottom-20 left-1/2 opacity-20" style="animation-delay: -2s;"></div>
+
+  <!-- Navigation -->
+  <nav class="glass-morphism fixed w-full z-50 transition-all duration-500 py-4" id="navbar">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+          <div class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent hover:scale-110 transition-transform duration-300">
+            <a href="#home" class="flex items-center">
+              <span class="animate-bounce mr-2">🚀</span>
+              <span class="typing-animation">Ibyiza byacu</span>
+            </a>
+          </div>
+        </div>
+        <div class="hidden lg:flex items-center space-x-8">
+          <a href="#home" class="nav-link relative group px-4 py-2 rounded-full transition-all duration-300 hover:bg-white/10">
+            Ahabanza
+            <span class="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
+          </a>
+          <a href="#services" class="nav-link relative group px-4 py-2 rounded-full transition-all duration-300 hover:bg-white/10">
+            Serivisi
+            <span class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
+          </a>
+          <a href="#innovation" class="nav-link relative group px-4 py-2 rounded-full transition-all duration-300 hover:bg-white/10">
+            Ubuhanga
+            <span class="absolute inset-0 rounded-full bg-gradient-to-r from-green-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
+          </a>
+          <a href="#contact" class="nav-link relative group px-4 py-2 rounded-full transition-all duration-300 hover:bg-white/10">
+            Twandikire
+            <span class="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-red-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
+          </a>
+        </div>
+        <div class="lg:hidden">
+          <button class="p-2 rounded-full hover:bg-white/10 transition-colors" id="mobileMenuButton">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero-3d min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div class="absolute inset-0" id="hero3d"></div>
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <div class="text-center">
+        <div class="mb-8">
+          <h1 class="text-6xl md:text-8xl font-black mb-6 parallax-element">
+            <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent text-glow">
+              Ibyiza byacu
+            </span>
+          </h1>
+          <div class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 parallax-element" data-speed="0.5">
+            <span class="typing-text">Dufite ubuhanga bwa AI, VR/AR, Blockchain n'ibindi by'ikoranabuhanga bya none</span>
+          </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-6 justify-center items-center parallax-element" data-speed="0.3">
+          <button class="magnetic-button neon-border px-8 py-4 rounded-full text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transform hover:scale-105 transition-all duration-300">
+            Tangira AI Journey <i class="fas fa-rocket ml-2"></i>
+          </button>
+          <button class="magnetic-button glass-morphism px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/20 transform hover:scale-105 transition-all duration-300">
+            VR Experience <i class="fas fa-vr-cardboard ml-2"></i>
+          </button>
+        </div>
+        
+        <!-- Stats Counter -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 parallax-element" data-speed="0.2">
+          <div class="holographic-card p-6 rounded-xl text-center">
+            <div class="text-3xl font-bold text-cyan-400 mb-2" data-counter="100">0+</div>
+            <div class="text-sm text-gray-400">AI Models</div>
+          </div>
+          <div class="holographic-card p-6 rounded-xl text-center">
+            <div class="text-3xl font-bold text-purple-400 mb-2" data-counter="50">0+</div>
+            <div class="text-sm text-gray-400">VR Projects</div>
+          </div>
+          <div class="holographic-card p-6 rounded-xl text-center">
+            <div class="text-3xl font-bold text-pink-400 mb-2" data-counter="200">0+</div>
+            <div class="text-sm text-gray-400">Clients</div>
+          </div>
+          <div class="holographic-card p-6 rounded-xl text-center">
+            <div class="text-3xl font-bold text-green-400 mb-2" data-counter="99">0%</div>
+            <div class="text-sm text-gray-400">Success Rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="py-20 relative section-reveal">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold mb-6">
+          <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Serivisi za Future
+          </span>
+        </h2>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+          Dukoresha tekenoloji za kijyambere zitarafata ku isi
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- AI Service -->
+        <div class="morphing-card holographic-card p-8 rounded-2xl group cursor-pointer">
+          <div class="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300">🤖</div>
+          <h3 class="text-2xl font-bold mb-4 text-cyan-400">Artificial Intelligence</h3>
+          <p class="text-gray-400 mb-6">Machine Learning, Deep Learning, NLP na Computer Vision by'ubuhanga bwa AI</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-sm">TensorFlow</span>
+            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-sm">PyTorch</span>
+            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-sm">GPT</span>
+          </div>
+          <div class="relative">
+            <svg class="progress-ring w-16 h-16" viewBox="0 0 100 100">
+              <circle class="progress-ring-circle" cx="50" cy="50" r="45" fill="transparent" stroke="currentColor" stroke-width="4" style="color: #06b6d4; stroke-dashoffset: 70;"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center text-sm font-bold text-cyan-400">95%</div>
+          </div>
+        </div>
+
+        <!-- VR/AR Service -->
+        <div class="morphing-card holographic-card p-8 rounded-2xl group cursor-pointer">
+          <div class="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300">🥽</div>
+          <h3 class="text-2xl font-bold mb-4 text-purple-400">VR/AR Development</h3>
+          <p class="text-gray-400 mb-6">Virtual Reality na Augmented Reality applications za kijyambere</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">Unity</span>
+            <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">Unreal</span>
+            <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">ARKit</span>
+          </div>
+          <div class="relative">
+            <svg class="progress-ring w-16 h-16" viewBox="0 0 100 100">
+              <circle class="progress-ring-circle" cx="50" cy="50" r="45" fill="transparent" stroke="currentColor" stroke-width="4" style="color: #a855f7; stroke-dashoffset: 85;"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center text-sm font-bold text-purple-400">90%</div>
+          </div>
+        </div>
+
+        <!-- Blockchain Service -->
+        <div class="morphing-card holographic-card p-8 rounded-2xl group cursor-pointer">
+          <div class="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300">⛓️</div>
+          <h3 class="text-2xl font-bold mb-4 text-green-400">Blockchain & Web3</h3>
+          <p class="text-gray-400 mb-6">Smart Contracts, DApps, NFTs na cryptocurrency solutions</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">Ethereum</span>
+            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">Solidity</span>
+            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">DeFi</span>
+          </div>
+          <div class="relative">
+            <svg class="progress-ring w-16 h-16" viewBox="0 0 100 100">
+              <circle class="progress-ring-circle" cx="50" cy="50" r="45" fill="transparent" stroke="currentColor" stroke-width="4" style="color: #10b981; stroke-dashoffset: 100;"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center text-sm font-bold text-green-400">85%</div>
+          </div>
+        </div>
+
+        <!-- IoT Service -->
+        <div class="morphing-card holographic-card p-8 rounded-2xl group cursor-pointer">
+          <div class="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300">📡</div>
+          <h3 class="text-2xl font-bold mb-4 text-yellow-400">IoT & Edge Computing</h3>
+          <p class="text-gray-400 mb-6">Internet of Things na Edge Computing solutions za smart cities</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm">Arduino</span>
+            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm">Raspberry Pi</span>
+            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm">5G</span>
+          </div>
+          <div class="relative">
+            <svg class="progress-ring w-16 h-16" viewBox="0 0 100 100">
+              <circle class="progress-ring-circle" cx="50" cy="50" r="45" fill="transparent" stroke="currentColor" stroke-width="4" style="color: #f59e0b; stroke-dashoffset: 115;"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center text-sm font-bold text-yellow-400">80%</div>
+          </div>
+        </div>
+
+        <!-- Quantum Service -->
+        <div class="morphing-card holographic-card p-8 rounded-2xl group cursor-pointer">
+          <div class="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300">⚛️</div>
+          <h3 class="text-2xl font-bold mb-4 text-indigo-400">Quantum Computing</h3>
+          <p class="text-gray-400 mb-6">Quantum algorithms na quantum machine learning research</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-full text-sm">Qiskit</span>
+            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-full text-sm">Cirq</span>
+            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-full text-sm">Q#</span>
+          </div>
+          <div class="relative">
+            <svg class="progress-ring w-16 h-16" viewBox="0 0 100 100">
+              <circle class="progress-ring-circle" cx="50" cy="50" r="45" fill="transparent" stroke="currentColor" stroke-width="4" style="color: #6366f1; stroke-dashoffset: 170;"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center text-sm font-bold text-indigo-400">60%</div>
+          </div>
+        </div>
+
+        <!-- Metaverse Service -->
+        <div class="morphing-card holographic-card p-8 rounded-2xl group cursor-pointer">
+          <div class="text-6xl mb-6 transform group-hover:scale-110 transition-transform duration-300">🌐</div>
+          <h3 class="text-2xl font-bold mb-4 text-pink-400">Metaverse Development</h3>
+          <p class="text-gray-400 mb-6">Virtual worlds, digital twins na immersive experiences</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-sm">Unreal Engine</span>
+            <span class="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-sm">Omniverse</span>
+            <span class="px-3 py-1 bg-pink-500/20 text-pink-400 rounded-full text-sm">WebXR</span>
+          </div>
+          <div class="relative">
+            <svg class="progress-ring w-16 h-16" viewBox="0 0 100 100">
+              <circle class="progress-ring-circle" cx="50" cy="50" r="45" fill="transparent" stroke="currentColor" stroke-width="4" style="color: #ec4899; stroke-dashoffset: 130;"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center text-sm font-bold text-pink-400">75%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Innovation Lab Section -->
+  <section id="innovation" class="py-20 relative section-reveal">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold mb-6">
+          <span class="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            Innovation Lab
+          </span>
+        </h2>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+          Twereka ibintu bifatika by'ejo hazaza
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <div class="space-y-8">
+            <div class="holographic-card p-6 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-300">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                  <i class="fas fa-brain text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-cyan-400">Neural Networks</h3>
+                  <p class="text-gray-400">Advanced AI ubwenge bw'ibyapa</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="holographic-card p-6 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-300">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <i class="fas fa-cube text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-purple-400">Digital Twins</h3>
+                  <p class="text-gray-400">Virtual representations of real-world systems</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="holographic-card p-6 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-300">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                  <i class="fas fa-leaf text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-green-400">Green Computing</h3>
+                  <p class="text-gray-400">Sustainable technology solutions</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="relative">
+          <div class="ai-chat-bubble glass-morphism p-8 rounded-2xl">
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full animate-pulse"></div>
+              <div class="text-lg font-semibold text-cyan-400">AI Assistant</div>
+              <div class="text-sm text-gray-400">Online</div>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 p-4 rounded-lg">
+                <p class="text-sm text-gray-300">
+                  <span class="typing-animation">Muraho! Ndi AI Assistant wacu wa kijyambere. Nashobora kugufasha mu</span>
+                  <span class="loading-dots"></span>
+                </p>
+              </div>
+              
+              <div class="bg-white/5 p-4 rounded-lg">
+                <p class="text-sm text-gray-300">
+                  • Machine Learning model development<br>
+                  • VR/AR application design<br>
+                  • Blockchain smart contracts<br>
+                  • IoT system architecture
+                </p>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <button class="magnetic-button bg-gradient-to-r from-cyan-500 to-purple-500 px-6 py-3 rounded-full text-white font-semibold hover:scale-105 transition-all duration-300">
+                Ganira na AI <i class="fas fa-comments ml-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-20 relative section-reveal">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold mb-6">
+          <span class="bg-gradient-to-r from-yellow-400 to-red-400 bg-clip-text text-transparent">
+            Twandikire
+          </span>
+        </h2>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+          Reka tukore hamwe ikintu gishya cy'ejo hazaza
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <!-- Contact Form -->
+        <div class="holographic-card p-8 rounded-2xl">
+          <form class="space-y-6" id="contactForm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Amazina</label>
+                <input type="text" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300" placeholder="Andika amazina yawe">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <input type="email" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300" placeholder="email@example.com">
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Serivisi</label>
+              <select class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300">
+                <option value="">Hitamo serivisi</option>
+                <option value="ai">Artificial Intelligence</option>
+                <option value="vr">VR/AR Development</option>
+                <option value="blockchain">Blockchain & Web3</option>
+                <option value="iot">IoT & Edge Computing</option>
+                <option value="quantum">Quantum Computing</option>
+                <option value="metaverse">Metaverse Development</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Ubutumwa</label>
+              <textarea rows="4" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300" placeholder="Andika ubutumwa bwawe hano..."></textarea>
+            </div>
+            
+            <button type="submit" class="magnetic-button w-full bg-gradient-to-r from-cyan-500 to-purple-500 px-8 py-4 rounded-lg text-white font-semibold hover:scale-105 transition-all duration-300">
+              Ohereza Ubutumwa <i class="fas fa-paper-plane ml-2"></i>
+            </button>
+          </form>
+        </div>
+        
+        <!-- Contact Info -->
+        <div class="space-y-8">
+          <div class="holographic-card p-6 rounded-xl">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-envelope text-white"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-cyan-400">Email</h3>
+                <p class="text-gray-400">info@ibyizabyacu.rw</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="holographic-card p-6 rounded-xl">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-phone text-white"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-purple-400">Telefoni</h3>
+                <p class="text-gray-400">+250 788 123 456</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="holographic-card p-6 rounded-xl">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-map-marker-alt text-white"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-green-400">Aho duba</h3>
+                <p class="text-gray-400">Kigali, Rwanda<br>KG 123 St, Nyarugenge</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="holographic-card p-6 rounded-xl">
+            <h3 class="text-lg font-semibold text-yellow-400 mb-4">Dukurikire kuri Social Media</h3>
+            <div class="flex space-x-4">
+              <a href="#" class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+                <i class="fab fa-twitter text-white"></i>
+              </a>
+              <a href="#" class="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+                <i class="fab fa-linkedin text-white"></i>
+              </a>
+              <a href="#" class="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+                <i class="fab fa-instagram text-white"></i>
+              </a>
+              <a href="#" class="w-10 h-10 bg-gradient-to-r from-gray-700 to-gray-800 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
+                <i class="fab fa-github text-white"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-black/50 border-t border-white/10 py-12">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+            Ibyiza byacu
+          </div>
+          <p class="text-gray-400 mb-4">
+            Dukoresha tekenoloji za kijyambere gukora ibintu bishya by'ejo hazaza
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">
+              <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-pink-400 transition-colors">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-green-400 transition-colors">
+              <i class="fab fa-github"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold text-white mb-4">Serivisi</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">AI Development</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">VR/AR Solutions</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-green-400 transition-colors">Blockchain</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition-colors">IoT Systems</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold text-white mb-4">Company</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">Kuri twe</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">Akazi</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-green-400 transition-colors">Blog</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition-colors">Press</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold text-white mb-4">Support</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">Help Center</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">Documentation</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-green-400 transition-colors">API Reference</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition-colors">Community</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-white/10 mt-12 pt-8 text-center">
+        <p class="text-gray-400">
+          © 2025 Ibyiza byacu. Amategeko yose yashinzwe. Designed with ❤️ in Rwanda
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile Menu -->
+  <div class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 opacity-0 invisible transition-all duration-300" id="mobileMenu">
+    <div class="flex flex-col items-center justify-center h-full space-y-8">
+      <a href="#home" class="text-2xl text-white hover:text-cyan-400 transition-colors">Ahabanza</a>
+      <a href="#services" class="text-2xl text-white hover:text-purple-400 transition-colors">Serivisi</a>
+      <a href="#innovation" class="text-2xl text-white hover:text-green-400 transition-colors">Ubuhanga</a>
+      <a href="#contact" class="text-2xl text-white hover:text-yellow-400 transition-colors">Twandikire</a>
+    </div>
+  </div>
+
+  <script>
+    // Interactive Cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    // Scroll Progress
+    window.addEventListener('scroll', () => {
+      const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      document.getElementById('scrollProgress').style.transform = `scaleX(${scrolled / 100})`;
+    });
+
+    // Particle System
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+      particle.style.animationDelay = Math.random() * 2 + 's';
+      document.getElementById('particleContainer').appendChild(particle);
+      
+      setTimeout(() => {
+        particle.remove();
+      }, 6000);
+    }
+
+    setInterval(createParticle, 500);
+
+    // Parallax Effect
+    document.addEventListener('mousemove', (e) => {
+      const mouseX = e.clientX / window.innerWidth;
+      const mouseY = e.clientY / window.innerHeight;
+      
+      document.querySelectorAll('.parallax-element').forEach(element => {
+        const speed = element.dataset.speed || 1;
+        const x = (mouseX - 0.5) * speed * 50;
+        const y = (mouseY - 0.5) * speed * 50;
+        element.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      });
+    });
+
+    // Three.js Hero Background
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('hero3d').appendChild(renderer.domElement);
+
+    // Create floating geometric shapes
+    const geometry = new THREE.IcosahedronGeometry(1, 1);
+    const material = new THREE.MeshBasicMaterial({ 
+      color: 0x667eea, 
+      wireframe: true,
+      transparent: true,
+      opacity: 0.3
+    });
+
+    const shapes = [];
+    for (let i = 0; i < 20; i++) {
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.x = (Math.random() - 0.5) * 20;
+      mesh.position.y = (Math.random() - 0.5) * 20;
+      mesh.position.z = (Math.random() - 0.5) * 20;
+      mesh.rotation.x = Math.random() * Math.PI;
+      mesh.rotation.y = Math.random() * Math.PI;
+      scene.add(mesh);
+      shapes.push(mesh);
+    }
+
+    camera.position.z = 10;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      shapes.forEach(shape => {
+        shape.rotation.x += 0.005;
+        shape.rotation.y += 0.005;
+        shape.position.y += Math.sin(Date.now() * 0.001 + shape.position.x) * 0.002;
+      });
+      
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Typing Animation
+    const texts = [
+      "Dufite ubuhanga bwa AI, VR/AR, Blockchain n'ibindi by'ikoranabuhanga bya none",
+      "Turimo gutegura ejo hazaza by'ikoranabuhanga",
+      "Innovation, Creativity, and Future Technology Combined"
+    ];
+    let currentText = 0;
+    let currentChar = 0;
+    let isDeleting = false;
+
+    function typeWriter() {
+      const element = document.querySelector('.typing-text');
+      const current = texts[currentText];
+      
+      if (isDeleting) {
+        element.textContent = current.substring(0, currentChar - 1);
+        currentChar--;
+      } else {
+        element.textContent = current.substring(0, currentChar + 1);
+        currentChar++;
+      }
+      
+      if (!isDeleting && currentChar === current.length) {
+        setTimeout(() => isDeleting = true, 2000);
+      } else if (isDeleting && currentChar === 0) {
+        isDeleting = false;
+        currentText = (currentText + 1) % texts.length;
+      }
+      
+      setTimeout(typeWriter, isDeleting ? 50 : 100);
+    }
+    typeWriter();
+
+    // Counter Animation
+    function animateCounters() {
+      const counters = document.querySelectorAll('[data-counter]');
+      counters.forEach(counter => {
+        const target = parseInt(counter.dataset.counter);
+        const increment = target / 100;
+        let current = 0;
+        
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          counter.textContent = Math.floor(current) + (counter.textContent.includes('%') ? '%' : '+');
+        }, 20);
+      });
+    }
+
+    // Intersection Observer for animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          if (entry.target.querySelector('[data-counter]')) {
+            animateCounters();
+          }
+        }
+      });
+    });
+
+    document.querySelectorAll('.section-reveal').forEach(section => {
+      observer.observe(section);
+    });
+
+    // Mobile Menu
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    mobileMenuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('opacity-0');
+      mobileMenu.classList.toggle('invisible');
+    });
+
+    mobileMenu.addEventListener('click', (e) => {
+      if (e.target === mobileMenu) {
+        mobileMenu.classList.add('opacity-0');
+        mobileMenu.classList.add('invisible');
+      }
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          
+          // Close mobile menu if open
+          mobileMenu.classList.add('opacity-0');
+          mobileMenu.classList.add('invisible');
+        }
+      });
+    });
+
+    // Form submission
+    document.getElementById('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Simulate form submission
+      const button = e.target.querySelector('button[type="submit"]');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Byoherejwe...';
+      button.disabled = true;
+      
+      setTimeout(() => {
+        button.innerHTML = '<i class="fas fa-check mr-2"></i>Byoherejwe neza!';
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.disabled = false;
+          e.target.reset();
+        }, 2000);
+      }, 2000);
+    });
+
+    // Navbar background on scroll
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 100) {
+        navbar.style.background = 'rgba(0, 0, 0, 0.9)';
+        navbar.style.backdropFilter = 'blur(20px)';
+      } else {
+        navbar.style.background = 'rgba(255, 255, 255, 0.1)';
+        navbar.style.backdropFilter = 'blur(20px)';
+      }
+    });
+
+    // Add magnetic effect to buttons
+    document.querySelectorAll('.magnetic-button').forEach(button => {
+      button.addEventListener('mousemove', (e) => {
+        const rect = button.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        
+        button.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+      });
+      
+      button.addEventListener('mouseleave', () => {
+        button.style.transform = 'translate(0, 0)';
+      });
+    });
+  </script>
+</body>
+</html>

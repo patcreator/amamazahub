@@ -1,0 +1,66 @@
+
+<body class="bg-gray-100 dark:bg-gray-800 flex items-center justify-center min-h-screen">
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-full">
+    <h1 class="text-2xl font-bold mb-4 text-center">To-Do App</h1>
+    <div class="flex mb-4">
+        <input id="taskInput" type="text" placeholder="Add a task" class="flex-1 p-2 border rounded-l-lg focus:outline-none dark:bg-gray-800 dark:border-gray-700">
+        <button onclick="addTask()" class="bg-red-500 text-white px-4 rounded-r-lg hover:bg-red-600">Add</button>
+    </div>
+    <ul id="todoList" class="space-y-2"></ul>
+</div>
+
+<script>
+const apiUrl = '/PDT-NEW/projects/pdo/app/system/api/todo.php';
+
+async function fetchTodos() {
+    const res = await fetch(apiUrl);
+    const todos = await res.json();
+    const list = document.getElementById('todoList');
+    list.innerHTML = '';
+    todos.forEach(todo => {
+        const li = document.createElement('li');
+        li.className = `flex justify-between items-center p-2 rounded ${
+            todo.completed ? 'bg-green-100 line-through dark:bg-green-800' : 'bg-gray-100 dark:bg-gray-700'
+        }`;
+        li.innerHTML = `
+            <span onclick="toggleComplete(${todo.id}, ${todo.completed})" class="cursor-pointer flex-1">${todo.task}</span>
+            <button onclick="deleteTask(${todo.id})" class="text-red-500  font-bold ml-2">X</button>
+        `;
+        list.appendChild(li);
+    });
+}
+
+async function addTask() {
+    const input = document.getElementById('taskInput');
+    if (!input.value.trim()) return;
+    await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task: input.value })
+    });
+    input.value = '';
+    fetchTodos();
+}
+
+async function toggleComplete(id, completed) {
+    await fetch(apiUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, completed: !completed })
+    });
+    fetchTodos();
+}
+
+async function deleteTask(id) {
+    await fetch(apiUrl, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+    });
+    fetchTodos();
+}
+
+// Load todos on start
+fetchTodos();
+</script>
+</body>

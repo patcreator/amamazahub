@@ -1,0 +1,54 @@
+<?php
+// Auto-generated report API for table: jobs
+
+require_once '../../../system/cogs/db.php';
+// Handle AJAX request
+if (isset($_GET['ajax'])) {
+    header('Content-Type: application/json');
+
+    $query = $_GET['query'] ?? '';
+    $status = $_GET['status'] ?? '';
+    $sort = $_GET['sort'] ?? '';
+    $dir = $_GET['dir'] ?? 'DESC';
+
+    $sql = "SELECT `id`, `job_media`, `job_title`, `slug`, `job_description`, `job_deadline`, `company`, `job_category`, `job_media_type`, `title`, `description`, `requirements`, `salary_min`, `salary_max`, `location`, `employment_type`, `experience_level`, `remote_option`, `visa_sponsorship`, `relocation_assistance`, `status`, `created_at`, `updated_at`, `company_id` FROM `jobs` WHERE 1";
+    $params = [];
+    if ($query) {
+        $likeParts = [];
+        $likeParts[] = "job_media LIKE ?";
+        $likeParts[] = "job_title LIKE ?";
+        $likeParts[] = "slug LIKE ?";
+        $likeParts[] = "job_description LIKE ?";
+        $likeParts[] = "title LIKE ?";
+        $likeParts[] = "description LIKE ?";
+        $likeParts[] = "requirements LIKE ?";
+        $likeParts[] = "location LIKE ?";
+        $sql .= " AND (" . implode(' OR ', $likeParts) . ")";
+        foreach ($likeParts as $lp) { $params[] = "%$query%"; }
+    }
+    if ($status) {
+        $sql .= " AND status = ?";
+        $params[] = $status;
+    }
+    $allowedSort = ['id','job_deadline','company','job_category','salary_min','salary_max','employment_type','visa_sponsorship','relocation_assistance','created_at','updated_at','company_id'];
+    if (!in_array($sort, $allowedSort)) {
+        $sort = $allowedSort[0];
+    }
+    $dir = strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC';
+    $sql .= " ORDER BY $sort $dir";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Optional: Add created_month if created_at exists
+    if (in_array('created_at', array_keys($rows[0] ?? []))) {
+        foreach ($rows as &$r) {
+            $r['created_month'] = date('M Y', strtotime($r['created_at']));
+        }
+    }
+
+    echo json_encode($rows);
+    exit;
+}
+?>

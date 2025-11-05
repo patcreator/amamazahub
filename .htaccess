@@ -1,0 +1,34 @@
+DirectoryIndex amamazahub.php
+Options -Indexes
+RewriteEngine On
+RewriteRule ^cmd[/]?$  app/system/cmd.php
+RewriteRule ^cmd-script[/]?$  app/system/cmd-script.php
+RewriteRule ^login[/]?$  app/auth/login.php
+RewriteRule ^logout[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^search_suggestions$ app/system/api/get_search.php?q=$0 [L,NC,QSA]
+
+RewriteRule ^s/Dashboard[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Search[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Create[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Content[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Analytics[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/History[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Profile[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Settings[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Explore[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Report[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/Help[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/feedback[/]?$ includes.php?page=$0 [L,NC,QSA]
+RewriteRule ^s/(.*)[/]?$ includes.php?page=$0 [L,NC,QSA]
+
+# Remove .php extension from URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^/]+)/?$ $1.php [L]
+
+# Redirect to HTTPS (optional)
+#RewriteCond %{HTTPS} off
+#RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+ErrorDocument 403 /PDT0/app/system/errors/403.html
+ErrorDocument 404 /PDT0/app/system/errors/404.html

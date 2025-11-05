@@ -1,0 +1,154 @@
+
+    <!-- Toggle Button -->
+    <button id="toggleFeedbackBtn" class=" ms-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+        + Send Feedback
+    </button>
+
+    <!-- Feedback Form Container (hidden by default) -->
+    <div id="feedbackContainer" class="hidden absolute dark:bg-slate-800 px-8 py-6 rounded-lg shadow-md w-full max-w-md bg-white ms-4 mt-2">
+        <h2 class="text-2xl font-bold mb-6 text-center">Send Feedback</h2>
+
+        <form id="feedbackForm" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <input type="text" name="name" placeholder="Your Name" class=" p-2  border rounded dark:bg-slate-800 dark:border-slate-600 " />
+            <input type="email" name="email" placeholder="Your Email" class=" p-2  border rounded dark:bg-slate-800 dark:border-slate-600 " />
+            
+            <input type="text" name="subject" placeholder="Subject" class="w-full p-2 border rounded dark:bg-slate-800 dark:border-slate-600 " />
+            
+            <select name="type" class="w-full p-2 border rounded">
+                <option value="general">General</option>
+                <option value="bug">Bug Report</option>
+                <option value="feature_request">Feature Request</option>
+            </select>
+            </div>
+            <textarea name="message" placeholder="Your Message" class="w-full p-2 border rounded dark:bg-slate-800 dark:border-slate-600 " rows="5" required></textarea>
+
+            <label class="flex items-center space-x-2">
+                <span>Rating:</span>
+                <input type="range" name="rating" min="1" max="5" class=" w-full p-1 border rounded" />
+            </label>
+
+            <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">
+                Send Feedback
+            </button>
+
+            <p id="feedbackMessage" class="text-center text-green-600 hidden"></p>
+        </form>
+    </div>
+
+
+
+<script>
+    const toggleBtn = document.getElementById('toggleFeedbackBtn');
+    const feedbackContainer = document.getElementById('feedbackContainer');
+
+    toggleBtn.addEventListener('click', () => {
+        feedbackContainer.classList.toggle('hidden'); // show/hide the form
+    });
+
+    const form = document.getElementById('feedbackForm');
+    const feedbackMessage = document.getElementById('feedbackMessage');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        const response = await fetch('<?= $path?>app/system/api/api_send_feedback.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        feedbackMessage.textContent = data.message;
+        feedbackMessage.classList.remove('hidden');
+        if (data.success) {
+            form.reset();
+            feedbackMessage.classList.add('text-green-600');
+            feedbackMessage.classList.remove('text-red-600');
+        } else {
+            feedbackMessage.classList.add('text-red-600');
+            feedbackMessage.classList.remove('text-green-600');
+        }
+    });
+</script>
+
+<div class="dark:bg-gray-800 dark:border-slate-800 py-7 rounded-2xl bg-white mx-4 my-3 border">
+
+<div class=" pt-0">
+
+<div class="max-w-5xl mx-auto overflow-x-auto">
+    <h1 class="text-3xl font-bold mb-6 mx-4">Feedback Management</h1>
+
+    <table class="min-w-full dark:bg-gray-900 bg-white shadow rounded">
+        <thead>
+            <tr class="bg-gray-200 text-left dark:bg-gray-700">
+                <th class="px-4 py-2">Name</th>
+                <th class="px-4 py-2">Email</th>
+                <th class="px-4 py-2">Subject</th>
+                <th class="px-4 py-2">Message</th>
+                <th class="px-4 py-2">Type</th>
+                <th class="px-4 py-2">Rating</th>
+                <th class="px-4 py-2">Action</th>
+            </tr>
+        </thead>
+        <tbody id="feedbackTable" class="divide-y"></tbody>
+    </table>
+</div>
+
+<script>
+const feedbackTable = document.getElementById('feedbackTable');
+
+async function loadFeedback() {
+    const res = await fetch('<?= $path?>app/system/api/api_get_feedback.php');
+    const data = await res.json();
+    if (!data.success) return;
+
+    feedbackTable.innerHTML = '';
+    data.feedback.forEach(f => {
+        const row = document.createElement('tr');
+        row.classList.add('dark:hover:bg-gray-800','dark:border-gray-800','hover:bg-gray-100');
+
+        row.innerHTML = `
+            <td class="px-4 py-2">${f.name || '-'}</td>
+            <td class="px-4 py-2">${f.email || '-'}</td>
+            <td class="px-4 py-2">${f.subject || '-'}</td>
+            <td class="px-4 py-2">${f.message}</td>
+            <td class="px-4 py-2">${f.type}</td>
+            <td class="px-4 py-2">${f.rating || '-'}</td>
+            <td class="px-4 py-2">
+                <select data-id="${f.id}" class="border p-1 rounded status-dropdown">
+                    <option value="new" ${f.status==='new'?'selected':''}>New</option>
+                    <option value="in_review" ${f.status==='in_review'?'selected':''}>In Review</option>
+                    <option value="resolved" ${f.status==='resolved'?'selected':''}>Resolved</option>
+                    <option value="closed" ${f.status==='closed'?'selected':''}>Closed</option>
+                </select>
+            </td>
+        `;
+        feedbackTable.appendChild(row);
+    });
+
+    document.querySelectorAll('.status-dropdown').forEach(el => {
+        el.addEventListener('change', async (e) => {
+            const id = e.target.dataset.id;
+            const status = e.target.value;
+
+            const res = await fetch('<?= $path?>app/system/api/api_update_feedback_status.php', {
+                method: 'POST',
+                headers: {'Content-Type':'application/x-www-form-urlencoded'},
+                body: `id=${id}&status=${status}`
+            });
+            const data = await res.json();
+            if (!data.success) {
+                alert('Failed to update status');
+                loadFeedback();
+            }
+        });
+    });
+}
+
+// Initial load
+loadFeedback();
+</script>
+
+</div>
+</div>

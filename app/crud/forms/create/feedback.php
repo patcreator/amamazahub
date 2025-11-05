@@ -1,0 +1,79 @@
+<div class="max-w-3xl mx-auto mt-8 bg-white p-6 rounded-lg shadow-md"><form id="addfeedbackForm" method="POST" action="/create/feedback" class="space-y-6">
+                <div>
+                    <label class='block text-sm font-medium text-gray-700 mb-1' for='id'>id</label>
+                    <input type='number' id='id' name='id' required value='641530' 
+                        maxlength='20'
+                        
+                        placeholder="Enter id" class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400' />
+                </div>
+            
+                <div>
+                    <label class='block text-sm font-medium text-gray-700 mb-1' for='user_id'>user_id</label>
+                    <input type='number' id='user_id' name='user_id'   
+                        maxlength='20'
+                        
+                        placeholder="Enter user_id" class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400' />
+                </div>
+            
+                <div>
+                    <label class='block text-sm font-medium text-gray-700 mb-1' for='name'>name</label>
+                    <input type='text' id='name' name='name'   
+                        maxlength='100'
+                        
+                        placeholder="Enter name" class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400' />
+                </div>
+            
+                <div>
+                    <label class='block text-sm font-medium text-gray-700 mb-1' for='email'>email</label>
+                    <input type='text' id='email' name='email'   
+                        maxlength='150'
+                        
+                        placeholder="Enter email" class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400' />
+                </div>
+            
+                <div>
+                    <label class='block text-sm font-medium text-gray-700 mb-1' for='subject'>subject</label>
+                    <input type='text' id='subject' name='subject'   
+                        maxlength='255'
+                        
+                        placeholder="Enter subject" class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400' />
+                </div>
+            
+                <div>
+                    <label class='block text-sm font-medium text-gray-700 mb-1' for='message'>message</label>
+                    <input type='text' id='message' name='message' required  
+                        
+                        
+                        placeholder="Enter message" class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400' />
+                </div>
+            
+                <div>
+                    <label class='block text-sm font-medium text-gray-700 mb-1' for='rating'>rating</label>
+                    <input type='number' id='rating' name='rating'   
+                        maxlength='11'
+                        
+                        placeholder="Enter rating" class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400' />
+                </div>
+            
+                <div>
+                    <label class='block text-sm font-medium text-gray-700 mb-1' for='type'>type</label>
+                    <input type='text' id='type' name='type'  value='general' 
+                        maxlength='50'
+                        
+                        placeholder="Enter type" class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400' />
+                </div>
+            
+            <div>
+                <label class='block text-sm font-medium text-gray-700 mb-1' for='status'>status</label>
+                <select id='status' name='status' 
+                    class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200 focus:border-blue-400'>
+                    <option value='' disabled selected>Select one</option><option value='ACTIVE' >ACTIVE</option><option value='NOT-ACTIVE' >NOT-ACTIVE</option>
+                </select>
+            </div>
+        
+            <div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+                    Add Feedback
+                </button>
+            </div>
+        </form></div>

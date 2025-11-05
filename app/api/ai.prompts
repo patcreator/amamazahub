@@ -1,0 +1,152 @@
+<?php
+$structureFile = '../structure.json';
+include '../../../api/db_helper.php';
+include '../../../api/ajax.php';
+$tables = json_decode(file_get_contents($structureFile), true);
+
+$selectedTable = $_GET['table'] ?? null;
+if (!$selectedTable || !isset($tables[$selectedTable])) {
+    echo '<p class="text-red-500">Table not found</p>';
+    exit;
+}
+
+$table = $tables[$selectedTable];
+$columns = $table['columns'];
+$permissions = $table['permission'];
+
+if (empty($permissions['insert'])) {
+    echo '<p class="text-gray-500">You do not have permission to insert data</p>';
+    exit;
+}
+
+// Generate form HTML
+echo '<h2 class="text-xl font-bold mb-4">Add New ' . $selectedTable . '</h2>';
+echo '<form id="dynamicForm" class="space-y-4">
+<input type="hidden" name="table" value="'.$selectedTable.'">
+';
+foreach ($columns as $col) {
+    if ($col['primary_key'] || $col['name'] == 'created_at' || $col['name'] == 'updated_at' || strtoupper($col['type']) == 'SERIAL') continue;
+    $type = $col['input_type'] ?? 'text';
+    $default = $col['default'] ?? '';
+    $info = $col['information_on_input'] ?? '';
+    echo '<div>';
+    echo '<label class="block font-medium mb-1">' . $col['name'] . '</label>';
+    echo '<input type="' . $type . '" name="' . $col['name'] . '" value="' . $default . '" placeholder="' . $info . '" class="border dark:border-gray-600 dark:bg-gray-800 p-2 rounded w-full active:border-red-600">';     
+    echo '</div>';
+}
+echo '<button type="submit" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">Save</button>';
+echo '</form>';  accourding to this structure 
+
+
+
+    "contacts": {
+        "columns": [
+            {
+                "name": "id",
+                "type": "int(11)",
+                "default": "",
+                "input_type": "number",
+                "placeholder": "Id",
+                "primary_key": true,
+                "is_unique": false,
+                "is_null": false,
+                "auto_increment": false,
+                "extra": "",
+                "min": 0,
+                "max": null
+            },
+            {
+                "name": "name",
+                "type": "varchar(100)",
+                "default": "",
+                "input_type": "text",
+                "placeholder": "Name",
+                "primary_key": false,
+                "is_unique": false,
+                "is_null": false,
+                "auto_increment": false,
+                "extra": "",
+                "min": null,
+                "max": 100
+            },
+            {
+                "name": "phone",
+                "type": "varchar(50)",
+                "default": "",
+                "input_type": "tel",
+                "placeholder": "Phone",
+                "primary_key": false,
+                "is_unique": false,
+                "is_null": false,
+                "auto_increment": false,
+                "extra": "",
+                "min": null,
+                "max": 50
+            },
+            {
+                "name": "email",
+                "type": "varchar(100)",
+                "default": "",
+                "input_type": "email",
+                "placeholder": "Email",
+                "primary_key": false,
+                "is_unique": false,
+                "is_null": true,
+                "auto_increment": false,
+                "extra": "",
+                "min": null,
+                "max": 100
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp",
+                "default": "current_timestamp()",
+                "input_type": "time",
+                "placeholder": "Created at",
+                "primary_key": false,
+                "is_unique": false,
+                "is_null": false,
+                "auto_increment": false,
+                "extra": "",
+                "min": null,
+                "max": null
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp",
+                "default": "current_timestamp()",
+                "input_type": "time",
+                "placeholder": "Updated at",
+                "primary_key": false,
+                "is_unique": false,
+                "is_null": false,
+                "auto_increment": false,
+                "extra": "on update current_timestamp()",
+                "min": null,
+                "max": null
+            },
+            {
+                "name": "status",
+                "type": "enum('active','not-active')",
+                "default": "active",
+                "input_type": "text",
+                "placeholder": "Status",
+                "primary_key": false,
+                "is_unique": false,
+                "is_null": true,
+                "auto_increment": false,
+                "extra": "",
+                "min": null,
+                "max": null
+            }
+        ],
+        "permission": {
+            "select": true,
+            "insert": true,
+            "update": true,
+            "delete": true
+        }
+    },
+    "feedback": {
+        "columns": [
+            { in structure.json extend my php code of get_form.php by checking the type if type is enum('') or set it will use select it type  table  i have property called 'fk_column_to_send' and fk_column_to_view create selct and data will select form those, if type == file or image or video, it will have video,audio,image,pdf if type is not defines it will <i class='fa fa-file'></i>the name; the type,the size in kbs and mbs allow click to upload and drag and drop, type json it wil be textarea default will be $default or {'key':'value'};for numbers min and max will be added on, blob type the file will be uploaded and we store blobs, it tiny int and boolean the switch,skip default current_timestamp(),auto_increment true,add * red star for is_null,false, add optional inplaceholder for is null true,

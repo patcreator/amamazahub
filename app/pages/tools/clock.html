@@ -1,0 +1,63 @@
+
+    <style>
+        /* Custom styles for clock hands (Tailwind doesn't have transform-origin out of the box) */
+        .hand {
+            transform-origin: bottom center;
+            transition: transform 0.05s cubic-bezier(0.4, 2.0, 0.2, 1);
+        }
+        .center-dot {
+            background-color: #333;
+            border-radius: 50%;
+        }
+    </style>
+<div class="flex items-center justify-center min-h-auto">
+    <div class="relative w-64 h-64 bg-white rounded-full shadow-lg border-4 border-gray-300 flex items-center justify-center">
+        <!-- Clock face numbers (simple markers for demo; you can add more detailed numbers) -->
+        <div class="absolute inset-0 flex items-center justify-center">
+            <!-- 12 o'clock mark -->
+            <div class="absolute top-2 w-2 h-8 bg-black rounded"></div>
+            <!-- 3 o'clock mark -->
+            <div class="absolute right-2 h-2 w-8 bg-black rounded"></div>
+            <!-- 6 o'clock mark -->
+            <div class="absolute bottom-2 w-2 h-8 bg-black rounded"></div>
+            <!-- 9 o'clock mark -->
+            <div class="absolute left-2 h-2 w-8 bg-black rounded"></div>
+        </div>
+
+        <!-- Hour hand -->
+        <div id="hour-hand" class="hand absolute w-1.5 bg-black h-20 bottom-1/2 left-1/2 transform -translate-x-0.5"></div>
+        
+        <!-- Minute hand -->
+        <div id="minute-hand" class="hand absolute w-1 bg-gray-700 h-28 bottom-1/2 left-1/2 transform -translate-x-0.5"></div>
+        
+        <!-- Second hand -->
+        <div id="second-hand" class="hand absolute w-0.5 bg-red-500 h-28 bottom-1/2 left-1/2 transform -translate-x-0.25"></div>
+        
+        <!-- Center dot -->
+        <div class="center-dot absolute w-4 h-4 z-10"></div>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const seconds = now.getSeconds();
+            const minutes = now.getMinutes();
+            const hours = now.getHours() % 12;
+
+            // Calculate rotations
+            const secondDeg = (seconds / 60) * 360 + 90; // +90 to start at 12
+            const minuteDeg = (minutes / 60) * 360 + (seconds / 60) * 6 + 90;
+            const hourDeg = (hours / 12) * 360 + (minutes / 60) * 30 + 90;
+
+            // Update hand rotations
+            document.getElementById('second-hand').style.transform = `rotate(${secondDeg}deg)`;
+            document.getElementById('minute-hand').style.transform = `rotate(${minuteDeg}deg)`;
+            document.getElementById('hour-hand').style.transform = `rotate(${hourDeg}deg)`;
+        }
+
+        // Update clock every second
+        setInterval(updateClock, 1000);
+        // Initial update
+        updateClock();
+    </script>
+</auto
