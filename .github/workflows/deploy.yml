@@ -23,5 +23,5 @@ jobs:
           remote-user: ${{ secrets.FTP_USERNAME }}
           remote-password: ${{ secrets.FTP_PASSWORD }}
           local-path: ./
-          remote-path: /amamazahub.com/
+          remote-path: /
           sync: delta
