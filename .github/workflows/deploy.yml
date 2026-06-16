@@ -1,0 +1,21 @@
+name: Auto Deploy to amamazahub.com
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Deploy via FTP
+        uses: milanmk/actions-file-deployer@master
+        with:
+          remote-url: ftp://${{ secrets.FTP_HOST }}/amamazahub.com/
+          remote-user: ${{ secrets.FTP_USERNAME }}
+          remote-password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
