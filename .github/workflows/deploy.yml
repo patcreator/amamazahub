@@ -24,14 +24,4 @@ jobs:
           remote-password: ${{ secrets.FTP_PASSWORD }}
           local-path: ./
           remote-path: /amamazahub.com/
-          - name: Deploy via FTP
-        uses: milanmk/actions-file-deployer@master
-        with:
-          remote-protocol: ftp
-          remote-host: ${{ secrets.FTP_HOST }}
-          remote-port: 21
-          remote-user: ${{ secrets.FTP_USERNAME }}
-          remote-password: ${{ secrets.FTP_PASSWORD }}
-          local-path: ./
-          remote-path: /amamazahub.com/
           sync: delta
